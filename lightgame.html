@@ -1256,6 +1256,16 @@ html, body {
 }
 </style>
 
+
+<style>
+.ir-transition-layer{
+  transition:opacity .22s ease;
+  will-change:opacity;
+}
+@media (max-width:600px){
+  .drag-ghost{pointer-events:none!important;touch-action:none!important;will-change:transform;transform-origin:center center;}
+}
+</style>
 </head>
 <body>
 
@@ -1996,6 +2006,7 @@ html, body {
     }
 
     function toggleIR() {
+    if (window.preloadQuantumVisuals) window.preloadQuantumVisuals();
         isIRActive = !isIRActive;
         const container = document.getElementById('game-container');
         const glassesBtn = document.getElementById('glasses-toggle');
@@ -2643,7 +2654,7 @@ html, body {
                 <div style="text-align: center; margin-top: 10px; width: 100%;">
                     <h3 style="color: #f3f4f6; margin-bottom: 5px; font-size: 16px;">מבחן Farnsworth-Munsell</h3>
                     <div class="fm-instructions">
-                        <b>סדרו את העיגולים מימין לשמאל</b> (מהאדום 1 אל הירוק 15).<br>
+                        <b>סדרו את העיגולים מימין לשמאל</b> (מהאדום אל הירוק).<br>
                         לחצו על עיגול לבחירה, ואז על עיגול אחר להחלפה.
                     </div>
                 </div>
@@ -3101,5 +3112,31 @@ async function saveFinalCard(){
  const draw=()=>{ctx.drawImage(img,0,0,w,h);const name=localStorage.getItem('playerName')||'חוקר';const s1=Number(localStorage.getItem('stage1Score')||0),s2=Number(localStorage.getItem('stage2Score')||0),s3=Number(localStorage.getItem('stage3Score')||0);ctx.direction='rtl';ctx.textAlign='center';ctx.fillStyle='#fff';ctx.font=`900 ${Math.round(w*.045)}px Arial`;ctx.fillText(name,w*.5,h*.22);ctx.textAlign='right';ctx.font=`700 ${Math.round(w*.022)}px Arial`;ctx.fillText(`שלב 1 · ${s1}/100`,w*.88,h*.40);ctx.fillText(`דני · ${s2}/100`,w*.88,h*.46);ctx.fillText(`שלב 3 · ${s3}/100`,w*.88,h*.52);ctx.font=`900 ${Math.round(w*.05)}px Arial`;ctx.fillText(`${s1+s2+s3} / 300`,w*.88,h*.78);canvas.toBlob(async blob=>{if(!blob)return;const file=new File([blob],'Quantum-Station-score.png',{type:'image/png'});if(navigator.share && navigator.canShare && navigator.canShare({files:[file]})){try{await navigator.share({files:[file],title:'Quantum Station',text:'שתפו אותנו בתחנת קוונטום'});return}catch(e){}}const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='Quantum-Station-score.png';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);},'image/png');};
  if(img.complete && img.naturalWidth) draw(); else img.onload=draw;
 }
+</script>
+
+<script>
+(function(){
+  const IR_ASSETS = [
+    'leavesIRN.png','leavesIRT.png','leavesIRH.png',
+    'watermeterIR.png','watermeterfull.png','watermeterempty.png',
+    'leavesV.png','cactusV.png','orchidV.png','succulentV.png','sunflowerV.png'
+  ];
+  const irCache = new Map();
+  function preloadImage(src){
+    if(irCache.has(src)) return irCache.get(src);
+    const img = new Image();
+    const promise = new Promise(resolve=>{
+      img.onload = async ()=>{ try { if(img.decode) await img.decode(); } catch(_){} resolve(img); };
+      img.onerror = ()=>resolve(img);
+    });
+    img.src = src;
+    irCache.set(src,promise);
+    return promise;
+  }
+  window.preloadQuantumVisuals = function(){
+    return Promise.all(IR_ASSETS.map(preloadImage));
+  };
+  window.preloadQuantumVisuals();
+})();
 </script>
 </body>
