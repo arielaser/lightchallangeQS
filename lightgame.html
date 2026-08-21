@@ -2157,35 +2157,39 @@ html, body {
     }
 
     function typeWriter(text, callback) {
-        // Mobile browsers can make hundreds of tiny timers + innerHTML writes feel sluggish.
-        // Use elapsed time + textContent so the typing speed stays visually consistent.
         if (window.__typeWriterCancel) window.__typeWriterCancel();
+
         textElement.textContent = "";
-        const mobile = window.matchMedia('(max-width: 700px)').matches;
-        const speed = mobile ? 11 : 30;
-        const started = performance.now();
-        let rafId = null;
-        let finished = false;
-        const finish = () => {
-            if (finished) return;
-            finished = true;
-            if (rafId) cancelAnimationFrame(rafId);
-            textElement.textContent = text;
-            window.__typeWriterCancel = null;
-            if (callback) callback();
-        };
+        const isMobile = window.matchMedia('(max-width: 700px), (pointer: coarse)').matches;
+        const speed = isMobile ? 24 : 30;
+
+        let index = 0;
+        let timerId = null;
+        let cancelled = false;
+
         window.__typeWriterCancel = () => {
-            finished = true;
-            if (rafId) cancelAnimationFrame(rafId);
+            cancelled = true;
+            if (timerId) clearTimeout(timerId);
+            window.__typeWriterCancel = null;
         };
-        const tick = (now) => {
-            if (finished) return;
-            const count = Math.min(text.length, Math.floor((now - started) / speed));
-            textElement.textContent = text.slice(0, count);
-            if (count >= text.length) finish();
-            else rafId = requestAnimationFrame(tick);
-        };
-        rafId = requestAnimationFrame(tick);
+
+        function typeNext() {
+            if (cancelled) return;
+
+            if (index >= text.length) {
+                window.__typeWriterCancel = null;
+                if (callback) callback();
+                return;
+            }
+
+            // Always append exactly one character per tick.
+            textElement.textContent += text.charAt(index);
+            index++;
+
+            timerId = setTimeout(typeNext, speed);
+        }
+
+        typeNext();
     }
 
     function setChoices(choicesArray) {
@@ -2710,7 +2714,7 @@ html, body {
                 <div style="text-align: center; margin-top: 10px; width: 100%;">
                     <h3 style="color: #f3f4f6; margin-bottom: 5px; font-size: 16px;">מבחן Farnsworth-Munsell</h3>
                     <div class="fm-instructions">
-                        <b>סדרו את העיגולים מימין לשמאל</b> (מהאדום אל הירוק).<br>
+                        <b>סדרו את העיגולים מימין לשמאל</b> (מהאדום 1 אל הירוק 15).<br>
                         לחצו על עיגול לבחירה, ואז על עיגול אחר להחלפה.
                     </div>
                 </div>
