@@ -1,0 +1,2855 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>Quantum Station - מעבדת מחקר</title>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #020408;
+            font-family: Arial, sans-serif;
+            color: white;
+            user-select: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        #game-container {
+            position: relative;
+            width: 400px;
+            height: 750px;
+            background-image: url('Planlightlvl1bkg.png');
+            background-size: cover;
+            background-position: center;
+            border: 2px solid #1e293b;
+            box-shadow: 0 0 30px rgba(0,0,0,0.8);
+            overflow: hidden;
+            transition: filter 0.4s ease, background-image 0.4s ease;
+        }
+
+        #game-container.ir-mode {
+            background-image: url('Planlightlvl1bkgIRV.png');
+        }
+
+        /* --- Intro Screen --- */
+        #intro-screen {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at center, #0b101b 0%, #010204 100%);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+            overflow: hidden;
+            transition: opacity 1s ease;
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            opacity: 0.8;
+            animation: twinkle 3s infinite alternate ease-in-out;
+        }
+        @keyframes twinkle {
+            0% { opacity: 0.3; transform: scale(0.8); }
+            100% { opacity: 1; transform: scale(1.2); }
+        }
+
+        #intro-content-box {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #intro-logo {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 8px;
+            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 0 15px rgba(0,0,0,0.8);
+        }
+
+        /* --- Spectrum Track --- */
+        #spectrum-intro-track {
+            position: relative;
+            width: 320px;
+            height: 14px;
+            background: #000000;
+            border-radius: 7px;
+            margin: 12px 0;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.15);
+            box-shadow: inset 0 0 8px rgba(0,0,0,0.9);
+        }
+
+        #spectrum-intro-fill {
+            position: absolute;
+            top: 0; left: 25%; width: 50%; height: 100%;
+            background: linear-gradient(90deg, 
+                red 0%, 
+                orange 17%, 
+                yellow 33%, 
+                green 50%, 
+                cyan 67%, 
+                blue 83%, 
+                violet 100%
+            );
+            box-shadow: 0 0 12px rgba(0, 255, 204, 0.4);
+            animation: spectrumIntroExpand 0.8s cubic-bezier(.22,.8,.25,1) .25s forwards;
+            transform-origin: center;
+        }
+
+        @keyframes spectrumIntroExpand {
+            0%   { left: 25%; width: 50%; }
+            100% { left: 0%; width: 100%; }
+        }
+
+        .spectrum-labels {
+            display: flex;
+            justify-content: space-between;
+            width: 320px;
+            font-size: 8px;
+            color: #94a3b8;
+            font-family: monospace;
+            margin-bottom: 12px;
+            direction: ltr;
+        }
+
+        .intro-title {
+            font-size: 14px;
+            color: #e2e8f0;
+            font-weight: 600;
+            margin-bottom: 15px;
+            letter-spacing: 0.5px;
+        }
+
+        #start-shift-btn {
+            background: #1e293b;
+            color: #f8fafc;
+            border: 1px solid #475569;
+            padding: 9px 22px;
+            font-size: 13px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        #start-shift-btn:hover {
+            background: #334155;
+            border-color: #64748b;
+        }
+
+        /* --- Tutorial Overlay --- */
+        #tutorial-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(2, 4, 8, 0.96);
+            z-index: 900;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        #tutorial-box {
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 18px;
+            width: 100%;
+            box-sizing: border-box;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.7);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: transform 1s ease, opacity 1s ease;
+        }
+
+        .tut-step-num {
+            font-size: 11px;
+            color: #38bdf8;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .tut-main-title {
+            font-size: 15px;
+            font-weight: bold;
+            color: #f8fafc;
+            margin-bottom: 4px;
+        }
+
+        .tut-sub-desc {
+            font-size: 11px;
+            color: #94a3b8;
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+
+        /* --- Game Elements --- */
+        #ir-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, rgba(20, 0, 40, 0.85) 0%, rgba(100, 0, 150, 0.35) 40%, rgba(255, 120, 0, 0.3) 75%, rgba(255, 255, 200, 0.4) 100%);
+            mix-blend-mode: overlay;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            z-index: 5;
+        }
+        .ir-mode #ir-overlay { opacity: 1; }
+
+        #spectrum-es-bar, #spectrum-ir-bar {
+            position: absolute;
+            top: 190px; left: 10px;
+            width: 85px; height: 340px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            z-index: 25;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        #spectrum-es-bar { background-image: url('spectrumES.png'); opacity: 1; }
+        .ir-mode #spectrum-es-bar { opacity: 0; }
+        #spectrum-ir-bar { background-image: url('spectrumIR.png'); opacity: 0; }
+        .ir-mode #spectrum-ir-bar { opacity: 1; }
+
+        #submit-btn {
+            position: absolute;
+            top: 85px; left: 130px;
+            width: 140px; height: 42px;
+            background: #d4d43b;
+            border: none; border-radius: 8px;
+            font-size: 15px; font-weight: bold; color: #111;
+            cursor: pointer; z-index: 50;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+            transition: transform 0.2s ease, background 0.2s ease;
+        }
+        #submit-btn:hover { background: #e5e541; transform: scale(1.05); }
+
+        #tools-bar {
+            position: absolute; top: 85px; width: 100%;
+            display: flex; justify-content: flex-end; align-items: center;
+            padding: 0 15px; box-sizing: border-box; z-index: 40; pointer-events: none;
+        }
+
+        .glasses-btn {
+            position: relative; width: 70px; height: 42px;
+            background-image: url('IRglasses.png'); background-size: cover; background-position: center;
+            border: 2px solid #3b82f6; border-radius: 8px; cursor: pointer;
+            overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+            transition: transform 0.2s ease, border-color 0.2s ease; pointer-events: auto;
+        }
+        .glasses-btn:hover { transform: scale(1.05); border-color: #60a5fa; }
+        .glasses-btn.active { border-color: #f97316; box-shadow: 0 0 15px #f97316; }
+        
+        #water-cup {
+            position: absolute; top: 85px; right: 15px; width: 55px; height: 65px;
+            background: linear-gradient(135deg, #164e63 0%, #083344 100%);
+            border: 2px solid #22d3ee; border-radius: 4px 4px 12px 12px;
+            cursor: grab; z-index: 45; touch-action: none;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        }
+        #water-cup:active { cursor: grabbing; }
+        .ir-mode #water-cup {
+            background: linear-gradient(135deg, #7c2d12 0%, #431407 100%) !important;
+            border-color: #f97316 !important;
+        }
+
+        #water-cup::before {
+            content: ''; position: absolute; left: -12px; top: 8px; width: 12px; height: 30px;
+            border: 3px solid #22d3ee; border-right: none; border-radius: 8px 0 0 8px;
+            background: rgba(34, 211, 238, 0.1);
+        }
+        .ir-mode #water-cup::before { border-color: #f97316 !important; }
+
+        .cup-ruler {
+            position: absolute; width: 16px; height: 36px; border-right: 2px solid #22d3ee;
+            display: flex; flex-direction: column; justify-content: space-between; align-items: flex-end; padding-right: 2px;
+        }
+        .ir-mode .cup-ruler { border-color: #f97316 !important; }
+        .cup-ruler span { display: block; width: 6px; height: 2px; background: #22d3ee; }
+        .ir-mode .cup-ruler span { background: #f97316 !important; }
+
+        .water-particle {
+            position: absolute; width: 4px; height: 4px; background: #3b82f6; border-radius: 50%;
+            pointer-events: none; z-index: 42; animation: fall-particle 0.6s linear forwards;
+        }
+        .ir-mode .water-particle { background: #f97316 !important; box-shadow: 0 0 6px #f97316; }
+        @keyframes fall-particle {
+            0% { transform: translate(0, 0) scale(1); opacity: 1; }
+            100% { transform: translate(var(--rand-x), 40px) scale(0.5); opacity: 0; }
+        }
+
+        #central-screen {
+            position: absolute; top: 150px; left: 50%; transform: translateX(-50%);
+            width: 140px; height: 140px; border-radius: 50%; background: transparent;
+            z-index: 30; pointer-events: none; transition: all 0.4s ease;
+        }
+        .ir-mode #central-screen {
+            background: radial-gradient(circle, rgba(255, 200, 0, 0.35) 0%, rgba(138, 43, 226, 0.3) 55%, rgba(10, 0, 50, 0.7) 100%);
+            box-shadow: 0 0 20px rgba(255, 140, 0, 0.4);
+        }
+
+        .clock-hand {
+            position: absolute; bottom: 50%; left: 50%; transform-origin: bottom center; border-radius: 2px; pointer-events: none; z-index: 35;
+        }
+        #hand-hour { width: 4px; height: 35px; background: #38bdf8; transform: translateX(-50%) rotate(0deg); }
+        #hand-minute { width: 2px; height: 48px; background: #e2e8f0; transform: translateX(-50%) rotate(0deg); }
+        .clock-center-dot {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 8px; height: 8px; background: #22d3ee; border-radius: 50%; z-index: 36;
+        }
+        .ir-mode #hand-hour { background: #fb923c !important; }
+        .ir-mode #hand-minute { background: #fef08a !important; }
+        .ir-mode .clock-center-dot { background: #f97316 !important; }
+
+        #slots-row {
+            position: absolute; bottom: 92px; width: 100%;
+            display: flex; justify-content: space-around; padding: 0 10px; box-sizing: border-box; z-index: 10;
+        }
+
+        .plant-slot {
+            width: 70px; height: 170px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; position: relative; cursor: grab; touch-action: none;
+        }
+        .plant-slot:active { cursor: grabbing; }
+
+        .plant-container { position: relative; width: 75px; height: 75px; margin-bottom: 8px; }
+        .plant-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; }
+
+        .water-meter-container {
+            position: relative; width: 70px; height: 20px; margin-top: 5px;
+            background: url('watermeterempty.png') center / 70px 20px no-repeat;
+        }
+        .water-meter-fill {
+            position: absolute; top: 0; right: 0; height: 100%; width: 0%;
+            overflow: hidden; transition: width 0.12s linear;
+            direction: ltr;
+        }
+        .water-meter-fill::after {
+            content: '';
+            position: absolute; top: 0; right: 0;
+            width: 70px; height: 20px;
+            background: url('watermeterfull.png') center / 70px 20px no-repeat;
+        }
+        .ir-mode .water-meter-container {
+            background: url('watermeterIR.png') center / 70px 20px no-repeat !important;
+        }
+        .ir-mode .water-meter-fill {
+            display: none;
+        }
+
+        .plant-slot.watering-active::after {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(249, 115, 22, 0.25); border: 2px dashed #f97316; border-radius: 8px; pointer-events: none;
+        }
+
+        .water-guide-label {
+            position: absolute; bottom: 65px; width: 100%;
+            display: flex; justify-content: space-between; padding: 0 22px; box-sizing: border-box;
+            font-size: 10px; font-weight: bold; color: #94a3b8; z-index: 12; text-align: center; white-space: nowrap;
+        }
+
+        /* --- Confirmation Modal --- */
+        #confirm-modal {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(5, 7, 12, 0.92); z-index: 300; display: none;
+            justify-content: center; align-items: center; flex-direction: column; text-align: center; padding: 25px; box-sizing: border-box;
+        }
+        .modal-box {
+            background: #0f172a; border: 1px solid #334155; padding: 20px; border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.6); max-width: 320px; width: 100%;
+        }
+        .modal-buttons {
+            display: flex; justify-content: space-between; margin-top: 20px; gap: 10px;
+        }
+        .modal-btn {
+            flex: 1; padding: 10px; border-radius: 6px; font-weight: bold; cursor: pointer; border: none; font-size: 13px;
+        }
+        .btn-cancel { background: #334155; color: #e2e8f0; }
+        .btn-confirm { background: #2563eb; color: white; }
+
+        /* --- Status Absorption Screen --- */
+        #status-screen {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(5, 7, 12, 0.95); z-index: 400; display: none;
+            justify-content: center; align-items: center; flex-direction: column; text-align: center; padding: 20px; box-sizing: border-box;
+        }
+
+        /* --- Stage flow --- */
+        .stage-flow {
+            width: 320px; display: flex; align-items: center; justify-content: center;
+            direction: rtl; margin: 0 0 16px;
+        }
+        .stage-flow-item { display:flex; flex-direction:column; align-items:center; gap:5px; min-width:82px; color:#64748b; font-size:8px; }
+        .stage-flow-dot { width:25px; height:25px; border-radius:50%; border:1px solid #334155; background:#0b1220; display:grid; place-items:center; font-size:10px; font-weight:bold; }
+        .stage-flow-item.active { color:#7dd3fc; }
+        .stage-flow-item.active .stage-flow-dot { background:#0c4a6e; border-color:#38bdf8; color:white; box-shadow:0 0 14px rgba(56,189,248,.35); }
+        .stage-flow-line { width:34px; height:2px; margin-top:-17px; background:#263548; }
+        .stage-flow-line.active { background:linear-gradient(90deg,#38bdf8,#2563eb); }
+
+        #help-btn {
+            width:28px; height:28px; margin-top:7px; border-radius:50%; border:1px solid #475569;
+            background:#0f172a; color:#e2e8f0; font-size:16px; font-weight:bold; cursor:pointer;
+            box-shadow:0 3px 8px rgba(0,0,0,.45); transition:transform .2s, border-color .2s, background .2s;
+        }
+        #help-btn:hover { transform:scale(1.08); border-color:#38bdf8; background:#17233a; }
+
+        #lesson-overlay {
+            position:absolute; inset:0; z-index:850; display:none; overflow:hidden;
+            background:rgba(0,0,0,.72); backdrop-filter:blur(1px);
+            align-items:center; justify-content:center; padding:20px; box-sizing:border-box;
+        }
+        #lesson-focus {
+            position:relative; width:100%; height:100%; max-width:390px; display:flex;
+            flex-direction:column; align-items:center; justify-content:center; text-align:center;
+            pointer-events:none;
+        }
+        #lesson-focus > * { pointer-events:auto; }
+        #lesson-visual {
+            position:relative; width:300px; height:400px; margin-bottom:5px;
+            display:flex; align-items:center; justify-content:center;
+        }
+        .lesson-plant-wrap { position:absolute; width:190px; height:220px; left:50%; top:38px; transform:translateX(-50%); }
+        .lesson-plant { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; transition:opacity .8s ease, transform .8s ease; }
+        .lesson-meter {
+            position:absolute; width:130px; height:38px; left:50%; bottom:35px; transform:translateX(-50%);
+            background:url('watermeterempty.png') center/contain no-repeat;
+        }
+        .lesson-meter-fill {
+            position:absolute; top:0; right:0; bottom:0; width:0%;
+            overflow:hidden; transition:width 1.7s cubic-bezier(.22,.8,.25,1);
+            direction:ltr;
+        }
+        .lesson-meter-fill::after {
+            content:''; position:absolute; top:0; right:0;
+            width:130px; height:38px;
+            background:url('watermeterfull.png') center/contain no-repeat;
+        }
+        .lesson-meter.ir { background-image:url('watermeterIR.png'); }
+        .lesson-meter.ir .lesson-meter-fill { display:none; }
+        .lesson-cup {
+            position:absolute; right:8px; top:-8px; width:52px; height:62px; opacity:0;
+            background:linear-gradient(135deg,#164e63,#083344); border:2px solid #22d3ee;
+            border-radius:4px 4px 12px 12px; box-shadow:0 4px 12px rgba(0,0,0,.55);
+        }
+        .lesson-cup::before { content:''; position:absolute; left:-13px; top:9px; width:11px; height:27px; border:3px solid #22d3ee; border-right:0; border-radius:8px 0 0 8px; }
+        .lesson-stream {
+            position:absolute; left:145px; top:96px;
+            width:5px; height:0; border-radius:8px;
+            background:#3b82f6; opacity:0; transform-origin:top;
+            box-shadow:0 0 8px rgba(59,130,246,.8);
+        }
+        #lesson-overlay.step-1.playing .lesson-cup { animation:lessonCup 2.3s cubic-bezier(.22,.8,.25,1) forwards; }
+        #lesson-overlay.step-1.playing .lesson-stream { animation:lessonWater 1.25s ease 1.15s forwards; }
+        #lesson-overlay.step-1.playing .lesson-meter-fill { width:88%; transition-delay:1.15s; }
+        @keyframes lessonCup { 0%{opacity:0;transform:translate(35px,-25px) rotate(0)} 20%{opacity:1} 60%{opacity:1;transform:translate(-105px,72px) rotate(23deg)} 85%{opacity:1;transform:translate(-105px,72px) rotate(23deg)} 100%{opacity:0;transform:translate(-105px,72px) rotate(23deg)} }
+        @keyframes lessonWater { 0%{opacity:0;height:0} 15%{opacity:1} 80%{opacity:1;height:105px} 100%{opacity:0;height:105px} }
+        .lesson-glasses { width:180px; height:115px; object-fit:contain; transition:transform .35s ease, filter .35s ease; }
+        .lesson-press { position:absolute; top:118px; left:50%; transform:translateX(-50%); width:48px; height:48px; border-radius:50%; border:2px solid rgba(255,255,255,.8); opacity:0; }
+        #lesson-overlay.step-2.playing .lesson-glasses { animation:glassesPress 1.25s ease .45s forwards; pointer-events:none; }
+        .step-2:not(.playing) .lesson-glasses { opacity:0; visibility:hidden; transform:scale(.08); }
+        #lesson-overlay.step-2.playing .lesson-press { animation:pressPulse 1.25s ease .45s; }
+        @keyframes glassesPress {
+            0%{transform:scale(1);opacity:1;visibility:visible}
+            45%{transform:scale(.91);filter:brightness(1.45);opacity:1;visibility:visible}
+            65%{transform:scale(1.04);opacity:1;visibility:visible}
+            100%{transform:scale(.08);opacity:0;visibility:hidden}
+        }
+        @keyframes pressPulse { 0%{opacity:0;transform:translateX(-50%) scale(.4)} 40%{opacity:1} 100%{opacity:0;transform:translateX(-50%) scale(1.8)} }
+        #lesson-title { font-size:16px; font-weight:bold; color:#f8fafc; min-height:24px; }
+        #lesson-text { width:330px; min-height:54px; font-size:12px; line-height:1.55; color:#cbd5e1; transition:opacity .25s ease, transform .25s ease; }
+        .lesson-nav { width:300px; display:flex; justify-content:space-between; align-items:center; margin-top:8px; direction:ltr; }
+        .lesson-arrow { width:42px; height:34px; border:1px solid #475569; border-radius:7px; background:#0f172a; color:white; cursor:pointer; font-size:21px; transition:transform .2s, background .2s; }
+        .lesson-arrow:hover:not(:disabled) { background:#1e293b; transform:scale(1.06); }
+        .lesson-arrow:disabled { opacity:.28; cursor:default; }
+        .lesson-progress { color:#64748b; font-size:10px; }
+
+        /* Step 6: Drag demo */
+        #lesson-drag-demo {
+            position:relative; width:286px; height:205px; display:none; align-items:center; justify-content:center;
+            overflow:hidden; border-radius:18px; border:1px solid rgba(88,173,255,.28);
+            background:radial-gradient(circle at 50% 45%,rgba(52,211,153,.10),transparent 55%),rgba(7,15,28,.72);
+            box-shadow:inset 0 0 35px rgba(0,0,0,.25),0 12px 30px rgba(0,0,0,.25);
+        }
+        .lesson-drag-slot {
+            position:absolute; top:30px; width:108px; height:135px; border:1px solid rgba(148,163,184,.28);
+            border-radius:14px; background:rgba(15,23,42,.72); display:flex; align-items:flex-end; justify-content:center;
+            box-shadow:inset 0 0 18px rgba(0,0,0,.22);
+        }
+        .lesson-drag-slot.left { left:22px; }
+        .lesson-drag-slot.right { right:22px; }
+        .lesson-drag-slot::before { content:'גרור'; position:absolute; top:8px; font-size:8px; letter-spacing:.8px; color:#64748b; }
+        .lesson-drag-plant { position:absolute; bottom:8px; width:92px; height:102px; object-fit:contain; filter:drop-shadow(0 7px 9px rgba(0,0,0,.4)); }
+        .lesson-drag-arrow {
+            position:absolute; left:50%; top:91px; transform:translateX(-50%); width:50px; height:26px;
+            border-radius:13px; background:rgba(15,23,42,.94); border:1px solid rgba(56,189,248,.38);
+            display:flex; align-items:center; justify-content:center; color:#67e8f9; font-size:18px;
+            box-shadow:0 0 18px rgba(34,211,238,.12); z-index:5;
+        }
+        .lesson-drag-label { position:absolute; bottom:10px; font-size:8px; color:#94a3b8; z-index:6; }
+        .lesson-drag-demo.play .lesson-drag-plant.left-plant { animation:lessonPlantSwapLeft 2.8s cubic-bezier(.22,.8,.25,1) .25s infinite; }
+        .lesson-drag-demo.play .lesson-drag-plant.right-plant { animation:lessonPlantSwapRight 2.8s cubic-bezier(.22,.8,.25,1) .25s infinite; }
+        .lesson-drag-demo.play .lesson-drag-arrow { animation:lessonDragArrow 2.8s ease .25s infinite; }
+        @keyframes lessonPlantSwapLeft {
+            0%,14%{transform:translateX(0) rotate(0) scale(1);opacity:1}
+            28%{transform:translateX(42px) translateY(-18px) rotate(-5deg) scale(1.06);opacity:1}
+            50%,62%{transform:translateX(154px) translateY(-2px) rotate(4deg) scale(.96);opacity:1}
+            74%{transform:translateX(112px) translateY(-8px) rotate(2deg) scale(1);opacity:1}
+            88%,100%{transform:translateX(0) rotate(0) scale(1);opacity:1}
+        }
+        @keyframes lessonPlantSwapRight {
+            0%,14%{transform:translateX(0) rotate(0) scale(1);opacity:1}
+            28%{transform:translateX(-42px) translateY(-18px) rotate(5deg) scale(1.06);opacity:1}
+            50%,62%{transform:translateX(-154px) translateY(-2px) rotate(-4deg) scale(.96);opacity:1}
+            74%{transform:translateX(-112px) translateY(-8px) rotate(-2deg) scale(1);opacity:1}
+            88%,100%{transform:translateX(0) rotate(0) scale(1);opacity:1}
+        }
+        @keyframes lessonDragArrow {
+            0%,18%,86%,100%{opacity:.35;transform:translateX(-50%) scale(.9)}
+            38%,68%{opacity:1;transform:translateX(-50%) scale(1.08)}
+        }
+        .step-6 #lesson-plant-wrap, .step-6 #lesson-glasses, .step-6 #lesson-press, .step-6 #lesson-cup, .step-6 #lesson-stream, .step-6 #lesson-meter { display:none !important; }
+        .step-6 #lesson-drag-demo { display:flex; }
+
+        /* =========================================================
+           STAGE 2 — STYLES
+           ========================================================= */
+        #s2-transition-card {
+            position: absolute; inset: 0; z-index: 10000; display: none;
+            align-items: center; justify-content: center; padding: 20px;
+            background: rgba(2, 4, 8, .96); text-align: center;
+        }
+        .s2-transition-box {
+            width: min(340px, 90vw); background: #0f172a; border: 1px solid #334155;
+            border-radius: 12px; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,.6);
+            animation: s2TransitionIn .35s ease both;
+            display: flex; flex-direction: column; align-items: center;
+        }
+        @keyframes s2TransitionIn { from { opacity: 0; transform: scale(.96) translateY(8px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+
+        #stage2-screen {
+            display: none;
+            position: absolute;
+            top: 0; left: 0;
+            width: 400px;
+            height: 750px;
+            background-color: #020408;
+            border: 2px solid #1e293b;
+            box-shadow: 0 0 30px rgba(0,0,0,0.8);
+            overflow: hidden;
+            z-index: 500;
+        }
+
+        #s2-room-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: #020408; z-index: 20; opacity: 1;
+            transition: opacity 1.5s ease-in-out; pointer-events: none;
+        }
+
+        #s2-wall { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; }
+
+        #task-square {
+            position: absolute; top: 60px; left: 30px; width: 340px; height: 310px;
+            background-color: #00ff22; border: 3px solid #00ff22;
+            box-shadow: 0 0 30px rgba(0, 255, 34, 0.6); z-index: 2; display: none;
+            transition: background-color 0.3s, border-color 0.3s, box-shadow 0.3s;
+        }
+
+        #task-timer {
+            position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
+            font-size: 22px; font-weight: 700; color: #38bdf8; z-index: 7; display: none;
+            background: rgba(15, 23, 42, 0.8); padding: 4px 16px; border-radius: 20px; border: 1px solid #38bdf8;
+        }
+
+        #color-comparison-container {
+            position: absolute; top: 70px; left: 50%; transform: translateX(-50%);
+            width: 340px; z-index: 5; display: none; flex-direction: column; gap: 8px;
+            background: rgba(15, 23, 42, 0.95); padding: 10px; border-radius: 12px; border: 1px solid #38bdf8;
+        }
+        .comparison-img-box { text-align: center; }
+        .comparison-img-box span { font-size: 12px; color: #38bdf8; display: block; margin-bottom: 2px; font-weight: 700; }
+        .comparison-img-box img { width: 100%; height: auto; border-radius: 6px; }
+
+        #cards-container {
+            position: absolute; top: 60px; left: 50%; transform: translateX(-50%);
+            width: 360px; z-index: 15; display: none; flex-direction: column; gap: 6px;
+        }
+        .purple-card {
+            background: rgba(15, 23, 42, 0.95); border: 1.5px solid #38bdf8; color: #f8fafc;
+            padding: 8px 12px; border-radius: 8px; cursor: pointer; font-family: 'Rubik', sans-serif;
+            font-size: 12px; text-align: right; transition: all 0.2s;
+        }
+        .purple-card.selected {
+            background: #38bdf8; color: #0f172a; font-weight: 700; border-color: #ffffff;
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+        }
+
+        #s2-danny-scene {
+            position: absolute; bottom: 215px; left: 50%; transform: translateX(-50%);
+            width: 180px; height: 220px; z-index: 3; display: flex; justify-content: center; align-items: flex-end; pointer-events: none;
+        }
+        .s2-danny { width: 100%; height: 100%; }
+
+        #s2-desk { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 4; pointer-events: none; }
+
+        .s2-dialogue {
+            position: absolute; bottom: 0; left: 0; width: 100%; padding: 16px;
+            box-sizing: border-box; background: transparent; z-index: 10; transition: opacity 0.3s;
+        }
+        .s2-dialogue-box { position: relative; width: 100%; }
+
+        .s2-speaker {
+            position: relative; width: 90px; height: 30px; background: rgba(15, 23, 42, 0.9);
+            border: 2px solid #38bdf8; border-radius: 10px; display: flex; align-items: center; justify-content: center;
+            margin-bottom: -6px; margin-right: 4px; z-index: 11; box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            font-size: 13px; font-weight: 700; color: #38bdf8;
+        }
+
+        .s2-text-container {
+            position: relative; width: 100%; min-height: 85px; background: rgba(15, 23, 42, 0.9);
+            border: 2px solid #38bdf8; border-radius: 14px; padding: 14px 18px; box-sizing: border-box;
+            box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.6), 0 6px 15px rgba(0,0,0,0.6); display: flex; align-items: center;
+        }
+
+        .s2-text { font-size: 14px; line-height: 1.5; color: #f8fafc; margin: 0; word-wrap: break-word; }
+        .s2-choices { display: flex; gap: 8px; margin-top: 10px; }
+        .s2-choice {
+            flex: 1; background: rgba(15, 23, 42, 0.9); border: 1px solid #38bdf8; color: #38bdf8;
+            padding: 8px; border-radius: 8px; cursor: pointer; font-family: 'Rubik', sans-serif;
+            font-weight: 700; font-size: 13px; transition: background 0.2s, color 0.2s; text-align: center;
+        }
+        .s2-choice:hover:not(:disabled) { background: #38bdf8; color: #0f172a; }
+        .s2-choice:disabled { opacity: 0.4; cursor: not-allowed; border-color: #64748b; color: #64748b; }
+    </style>
+
+<style id="final-flow-styles">
+#name-screen{
+ position:fixed;inset:0;z-index:5000;display:flex;align-items:center;justify-content:center;
+ background:radial-gradient(circle at 50% 45%,#111b32 0%,#050812 55%,#02040a 100%);color:white;
+}
+.name-card{width:min(420px,88vw);padding:28px 30px;border:1px solid rgba(148,163,184,.24);border-radius:22px;background:rgba(10,16,30,.92);box-shadow:0 25px 70px rgba(0,0,0,.55);text-align:center}
+.name-card h1{margin:0 0 8px;font-size:26px}.name-card p{margin:0 0 20px;color:#94a3b8;font-size:13px}.name-input{width:100%;box-sizing:border-box;padding:13px 15px;border-radius:11px;border:1px solid #334155;background:#0f172a;color:#fff;font-size:16px;text-align:center;outline:none}.name-input:focus{border-color:#38bdf8;box-shadow:0 0 0 3px rgba(56,189,248,.12)}.name-start{margin-top:12px;width:100%;padding:12px;border:0;border-radius:11px;background:#38bdf8;color:#06111a;font-weight:900;cursor:pointer}.name-error{height:16px;margin-top:7px;color:#f87171;font-size:11px}
+#score-tension{position:fixed;z-index:70000;display:none;align-items:center;justify-content:center;background:#02040a;color:white;overflow:hidden}.tension-number{font-size:clamp(100px,18vw,260px);font-weight:900;line-height:1;animation:tensionThrow .72s cubic-bezier(.08,.72,.17,1) forwards}.tension-label{position:absolute;top:22%;font-size:18px;color:#94a3b8;font-weight:700}.tension-ready{font-size:clamp(28px,4vw,56px);font-weight:900;animation:tensionReady .8s ease forwards}.tension-hidden{opacity:0;transform:scale(4)}
+@keyframes tensionReady{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}@keyframes tensionThrow{0%{opacity:0;transform:scale(5) translateZ(0)}25%{opacity:1}100%{opacity:0;transform:scale(.08) translateZ(0)}}
+#final-results{
+ position:fixed;
+ left:50%;
+ top:50%;
+ width:min(100vw,56.25vh);
+ height:min(100vh,177.7778vw);
+ transform:translate(-50%,-50%);
+ z-index:4800;
+ display:none;
+ overflow-y:auto;
+ overflow-x:hidden;
+ background:radial-gradient(circle at 50% 18%,#18233c,#050812 72%);
+ color:white;
+ padding:28px 18px 60px;
+ box-sizing:border-box;
+}
+.final-wrap{width:100%;max-width:920px;margin:0 auto}.final-card-preview{position:relative;width:min(520px,94%);margin:0 auto 16px;aspect-ratio:1123/794;border-radius:18px;overflow:hidden;box-shadow:0 22px 70px rgba(0,0,0,.5);background:#111}.final-card-preview img{width:100%;height:100%;object-fit:cover}.card-overlay-name{position:absolute;left:50%;top:20%;transform:translateX(-50%);font-size:clamp(18px,3vw,30px);font-weight:900;white-space:nowrap}.card-overlay-scores{position:absolute;right:10%;top:37%;font-size:clamp(11px,1.7vw,16px);line-height:1.7;text-align:right}.card-overlay-total{position:absolute;right:10%;bottom:18%;font-size:clamp(18px,3vw,28px);font-weight:900}.shine{position:absolute;inset:-20% auto -20% -35%;width:18%;transform:skewX(-18deg);background:linear-gradient(90deg,transparent,rgba(255,255,255,.9),transparent);animation:cardShine 1.25s ease-out .2s forwards}.final-title{text-align:center;font-size:22px;margin:0 0 7px}.final-sub{text-align:center;color:#94a3b8;margin:0 0 12px;font-size:11px}.save-card{display:block;margin:0 auto 4px;padding:11px 20px;border:1px solid #38bdf8;border-radius:11px;background:#0b1625;color:#e0f2fe;font-weight:900;cursor:pointer}.share-caption{text-align:center;margin:0;color:#e2e8f0;font-size:13px}.medical-note{text-align:center;color:#64748b;font-size:10px;margin:4px 0 22px}.results-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.result-panel{background:rgba(15,23,42,.82);border:1px solid rgba(148,163,184,.18);border-radius:15px;padding:15px}.result-panel h3{margin:0 0 10px;font-size:15px}.score-big{font-size:24px;font-weight:900;margin-bottom:10px}.result-line{font-size:11px;line-height:1.6;color:#cbd5e1;border-top:1px solid rgba(148,163,184,.12);padding-top:7px;margin-top:7px}.good{color:#4ade80}.bad{color:#f87171}
+.plant-order-block{margin-top:10px}
+.plant-order-title{font-size:10px;color:#94a3b8;margin:9px 0 6px;font-weight:800}
+.plant-order-row{display:flex;direction:ltr;justify-content:center;gap:6px;flex-wrap:nowrap;padding:5px 2px 8px}
+.plant-result-item{width:48px;min-width:48px;text-align:center}
+.plant-result-item img{display:block;width:44px;height:52px;object-fit:contain;margin:0 auto 2px}
+.plant-result-item span{display:block;font-size:7px;color:#cbd5e1;white-space:nowrap}
+.color-order-row{display:flex;direction:ltr;gap:4px;justify-content:center;flex-wrap:wrap;margin-top:6px}
+.color-result-dot{width:18px;height:18px;border-radius:50%;border:1px solid rgba(255,255,255,.35);box-shadow:0 2px 5px rgba(0,0,0,.25)}
+.result-choice-line{font-size:10px;line-height:1.55;border-top:1px solid rgba(148,163,184,.12);padding-top:7px;margin-top:7px}
+.result-choice-line .choice-text{font-weight:900}
+.result-choice-line .choice-why{display:block;color:#94a3b8;font-weight:400;margin-top:2px}
+@keyframes cardShine{0%{left:-35%;opacity:0}20%{opacity:1}100%{left:125%;opacity:0}}
+@media(max-width:800px){
+ .results-grid{grid-template-columns:1fr}
+ #final-results{padding:20px 14px 34px}
+ .final-card-preview{width:96%}
+}
+</style>
+
+<style id="stage-transition-fixes">
+/* Stage 1 must never peek through while Stage 2/3 or the transition is active. */
+body.stage1-complete #ir-overlay,
+body.stage1-complete #spectrum-es-bar,
+body.stage1-complete #spectrum-ir-bar,
+body.stage1-complete #submit-btn,
+body.stage1-complete #tools-bar,
+body.stage1-complete #water-cup,
+body.stage1-complete #central-screen,
+body.stage1-complete #slots-row,
+body.stage1-complete .water-guide-label,
+body.stage1-complete #lesson-overlay,
+body.stage1-complete #confirm-modal,
+body.stage1-complete #help-btn {
+    display:none !important;
+    visibility:hidden !important;
+    pointer-events:none !important;
+}
+
+/* Final/tension screens are always a portrait 1080:1920 canvas, scaled to fit. */
+#score-tension{
+    left:50%; top:50%; right:auto; bottom:auto;
+    width:min(100vw,56.25vh);
+    height:min(100vh,177.7778vw);
+    transform:translate(-50%,-50%);
+    aspect-ratio:9 / 16;
+}
+#final-results{
+    width:min(100vw,56.25vh);
+    height:min(100vh,177.7778vw);
+    aspect-ratio:9 / 16;
+}
+#final-results .results-grid{
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+}
+#final-results .result-panel{
+    width:100%;
+    box-sizing:border-box;
+}
+
+/* Keep the water-direction labels intact on one line. */
+.water-guide-label span{
+    white-space:nowrap !important;
+}
+</style>
+<style id="single-stage-isolation">
+body.stage3-active #game-container, body.final-results-active #game-container{visibility:hidden !important;pointer-events:none !important;}
+body.final-results-active #game-container *{pointer-events:none !important;}
+#stage3-screen,#score-tension,#final-results{isolation:isolate;}
+
+/* During the Stage 2 -> Stage 3 transition there is exactly ONE visible surface:
+   the transition card. Nothing from Stage 1/2 or Stage 3 may peek through. */
+body.stage3-transition-active #game-container,
+body.stage3-transition-active #stage2-screen,
+body.stage3-transition-active #stage3-screen,
+body.stage3-transition-active #score-tension,
+body.stage3-transition-active #final-results{
+    display:none !important;
+    visibility:hidden !important;
+    opacity:0 !important;
+    pointer-events:none !important;
+}
+body.stage3-transition-active #s3-transition-card{
+    display:flex !important;
+    visibility:visible !important;
+    opacity:1 !important;
+    pointer-events:auto !important;
+    position:fixed !important;
+    inset:0 !important;
+    z-index:50000 !important;
+    width:100vw !important;
+    height:100vh !important;
+    background:#02040a !important;
+    align-items:center !important;
+    justify-content:center !important;
+}
+body.stage3-transition-active #s3-transition-card .s2-transition-box{
+    position:relative;
+    z-index:2;
+}
+
+#stage3-screen.stage3-hidden{
+    display:none !important;
+    visibility:hidden !important;
+    opacity:0 !important;
+}
+</style>
+<style id="stage3-styles">
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000000; /* רקע חיצוני שחור נקי */
+            font-family: 'Rubik', sans-serif;
+            color: #d1d5db;
+            user-select: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        #stage3-screen {
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: min(100vw, 56.25vh);
+            height: min(100vh, 177.7778vw);
+            max-width: 100vw;
+            max-height: 100vh;
+            background-image: url('lvl3bkg.png');
+            background-size: cover;
+            background-position: center;
+            border: 1px solid #333;
+            background-color: #0a0a0a;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        /* רקע חלל עם ערפילית סגולה זזה וכוכבים חולפים - ממוקם בתוך המסך בלבד */
+        #stars-bg {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: 
+                radial-gradient(circle at 30% 40%, rgba(88, 28, 135, 0.35) 0%, transparent 50%),
+                radial-gradient(circle at 70% 80%, rgba(76, 29, 149, 0.25) 0%, transparent 40%),
+                radial-gradient(white, rgba(255,255,255,.25) 2px, transparent 40px),
+                radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 30px);
+            background-size: 100% 100%, 100% 100%, 500px 500px, 300px 300px;
+            animation: spaceDrift 20s ease-in-out infinite alternate;
+            opacity: 0.6;
+            z-index: 0; /* יושב מאחורי כל שאר האלמנטים במסך */
+            pointer-events: none;
+        }
+
+        @keyframes spaceDrift {
+            0% {
+                background-position: 0% 0%, 0% 0%, 0px 0px, 0px 0px;
+            }
+            100% {
+                background-position: 100% 50%, -50% -30%, 250px 250px, -150px -150px;
+            }
+        }
+
+        #levels-header {
+            position: absolute;
+            top: 30px;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            z-index: 25;
+            font-size: 12px;
+            font-weight: 700;
+        }
+        .lvl-indicator {
+            display: none;
+            color: #9ca3af;
+            padding: 4px 12px;
+            border-radius: 4px;
+            background: #111;
+            border: 1px solid #333;
+        }
+
+        #s3-room-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: #050505;
+            z-index: 30;
+            opacity: 1;
+            transition: opacity 1.2s ease-in-out;
+            pointer-events: none;
+        }
+
+        #screens-wrapper {
+            position: absolute;
+            top: 65px;
+            left: 0;
+            width: 100%;
+            height: calc(100% - 65px);
+            overflow: hidden;
+            z-index: 5; /* מעל שכבת הרקע של החלל */
+        }
+
+        .sub-screen {
+            position: absolute;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            padding: 15px 25px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            transition: left 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+            left: 100%; 
+        }
+
+        .title-box {
+            text-align: center;
+            margin-top: 30px;
+            width: 100%;
+        }
+        .title-box h1 {
+            font-size: 22px;
+            color: #f3f4f6;
+            margin-bottom: 12px;
+            text-shadow: none;
+        }
+        .title-box p {
+            font-size: 13px;
+            color: #9ca3af;
+            line-height: 1.5;
+            margin-bottom: 20px;
+            padding: 0 10px;
+        }
+
+        .center-content-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            margin-top: 15px;
+        }
+
+        .item-viewport {
+            width: 250px;
+            height: 250px;
+            background: transparent;
+            border: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: visible;
+            flex-shrink: 0;
+            margin-top: 25px;
+        }
+
+        .item-viewport img {
+            max-width: 110%;
+            max-height: 110%;
+            object-fit: contain;
+        }
+
+        .item-header-title {
+            color: #e5e7eb;
+            font-weight: 700;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            width: 100%;
+            margin-top: 15px;
+        }
+
+        .opt-btn {
+            background: rgba(17, 17, 17, 0.85);
+            border: 1px solid #333;
+            color: #9ca3af;
+            padding: 11px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: 'Rubik', sans-serif;
+            font-weight: 700;
+            font-size: 14px;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .opt-btn:hover {
+            background: rgba(31, 31, 31, 0.9);
+            color: #f3f4f6;
+            border-color: #555;
+        }
+
+        .opt-btn.selected {
+            background: #f3f4f6;
+            color: #050505;
+            border-color: #f3f4f6;
+            box-shadow: none;
+        }
+
+        .nav-buttons-row {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-bottom: 25px;
+        }
+
+        .action-btn {
+            background: rgba(17, 17, 17, 0.85);
+            border: 1px solid #333;
+            color: #9ca3af;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: 'Rubik', sans-serif;
+            font-weight: 700;
+            font-size: 14px;
+            transition: 0.2s;
+        }
+        .action-btn:hover:not(:disabled) {
+            background: rgba(31, 31, 31, 0.9);
+            color: #f3f4f6;
+            border-color: #555;
+        }
+        .action-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            border-color: #222;
+            color: #444;
+        }
+
+        .fm-instructions {
+            font-size: 12px;
+            color: #9ca3af;
+            text-align: center;
+            margin-bottom: 10px;
+            line-height: 1.4;
+            background: rgba(17, 17, 17, 0.85);
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #333;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .direction-indicator {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            max-width: 360px;
+            font-size: 11px;
+            color: #4ade80;
+            margin-bottom: 6px;
+            padding: 0 5px;
+            font-weight: bold;
+        }
+
+        #circles-row {
+            display: flex;
+            gap: 5px;
+            justify-content: center;
+            flex-wrap: wrap;
+            max-width: 360px;
+            margin-bottom: 15px;
+            background: rgba(17, 17, 17, 0.85);
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #333;
+        }
+
+        .fm-circle {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+        .fm-circle.selected-circle {
+            border-color: #ffffff;
+            transform: scale(1.25);
+            z-index: 5;
+        }
+
+        .score-box {
+            background: rgba(17, 17, 17, 0.85);
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 20px;
+            width: 100%;
+            box-sizing: border-box;
+            margin-bottom: 15px;
+        }
+        .score-text {
+            font-size: 15px;
+            margin: 10px 0;
+            color: #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+        }
+    
+
+<style>
+#stage3-screen{width:min(100vw,177.7778vh);height:min(100vh,56.25vw);max-width:100vw;max-height:100vh;}
+</style>
+</head>
+<body>
+
+<div id="game-container">
+
+    <div id="name-screen">
+      <div class="name-card">
+        <div style="font-size:11px;color:#38bdf8;font-weight:900;letter-spacing:1px;margin-bottom:7px">QUANTUM STATION</div>
+        <h1>לפני שמתחילים</h1>
+        <p>איך נרשום אותך בתחנה?</p>
+        <input id="player-name" class="name-input" maxlength="24" autocomplete="name" placeholder="השם שלך" />
+        <div id="name-error" class="name-error"></div>
+        <button class="name-start" onclick="savePlayerName()">כניסה לתחנה</button>
+      </div>
+    </div>
+
+    <!-- Intro Sequence Overlay -->
+    <div id="intro-screen">
+        <div id="intro-content-box">
+            <img id="intro-logo" src="QSlogo.png" alt="Quantum Station Logo">
+            <div class="intro-title">ברוכים הבאים למעבדה של תחנת קוונטום</div>
+            
+            <div id="spectrum-intro-track">
+                <div id="spectrum-intro-fill"></div>
+            </div>
+            <div class="spectrum-labels" dir="ltr">
+                <span>γ / X / UV</span>
+                <span>[ אור נראה ]</span>
+                <span>IR / Mic / Radio</span>
+            </div>
+
+            <button id="start-shift-btn" onclick="openLabTutorial()">כניסה למעבדה</button>
+        </div>
+    </div>
+
+    <!-- Lab Entry Tutorial Overlay -->
+    <div id="tutorial-overlay" style="display: none;">
+        <div id="tutorial-box">
+            <div class="stage-flow">
+                <div class="stage-flow-item"><div class="stage-flow-dot">3</div><span>סריקת ספקטרום</span></div>
+                <div class="stage-flow-line"></div>
+                <div class="stage-flow-item"><div class="stage-flow-dot">2</div><span>מעבדת תפיסה</span></div>
+                <div class="stage-flow-line active"></div>
+                <div class="stage-flow-item active"><div class="stage-flow-dot">1</div><span>סימולטור אינפרא אדום</span></div>
+            </div>
+            <div class="tut-step-num">שלב 1</div>
+            <div class="tut-main-title">סימולטור אינפרא אדום</div>
+            <div class="tut-sub-desc" style="font-size: 11px; color: #38bdf8; font-weight: bold; margin-top: 4px;">
+                סדרו את הצמחים לפי כמות המים שהם צריכים
+            </div>
+        </div>
+    </div>
+
+    <!-- Focused explanation -->
+    <div id="lesson-overlay" aria-hidden="true">
+        <div id="lesson-focus">
+            <div id="lesson-visual">
+                <div class="lesson-plant-wrap" id="lesson-plant-wrap">
+                    <img id="lesson-leaves-v" class="lesson-plant" src="leavesV.png" alt="צמח בראייה רגילה">
+                    <img id="lesson-leaves-n" class="lesson-plant" src="leavesIRN.png" style="opacity:0" alt="צמח בריא באינפרא אדום">
+                    <img id="lesson-leaves-t" class="lesson-plant" src="leavesIRT.png" style="opacity:0" alt="צמח עם עודף מים באינפרא אדום">
+                    <img id="lesson-leaves-h" class="lesson-plant" src="leavesIRH.png" style="opacity:0" alt="צמח יבש באינפרא אדום">
+                </div>
+                <img id="lesson-glasses" class="lesson-glasses" src="IRglasses.png" alt="משקפי אינפרא אדום" style="display:none;">
+                <div class="lesson-press"></div>
+                <div id="lesson-cup" class="lesson-cup"></div>
+                <div id="lesson-stream" class="lesson-stream"></div>
+                <div id="lesson-meter" class="lesson-meter">
+                    <div class="lesson-meter-fill"></div>
+                </div>
+                <div id="lesson-drag-demo" class="lesson-drag-demo play" aria-label="הדגמת גרירת צמחים">
+                    <div class="lesson-drag-slot left">
+                        <img class="lesson-drag-plant left-plant" src="leavesV.png" alt="leavesV">
+                    </div>
+                    <div class="lesson-drag-slot right">
+                        <img class="lesson-drag-plant right-plant" src="cactusV.png" alt="cactusV">
+                    </div>
+                    <div class="lesson-drag-arrow">↔</div>
+                    <div class="lesson-drag-label">כך מסדרים את הצמחים לפי המיקום הנכון</div>
+                </div>
+            </div>
+            <div id="lesson-title"></div>
+            <div id="lesson-text"></div>
+            <div class="lesson-nav">
+                <button id="lesson-prev" class="lesson-arrow" onclick="changeLesson(-1)">‹</button>
+                <span id="lesson-progress" class="lesson-progress">1 / 5</span>
+                <button id="lesson-next" class="lesson-arrow" onclick="changeLesson(1)">›</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirm-modal">
+        <div class="modal-box">
+            <h3 style="margin-top: 0; color: #38bdf8; font-size: 16px;">אישור הגשת משימה</h3>
+            <p style="font-size: 13px; color: #94a3b8; line-height: 1.5;">אתה עומד להגיש את סדר הצמחים.<br>לאחר השליחה לא ניתן לשנות את התשובה.</p>
+            <div class="modal-buttons">
+                <button class="modal-btn btn-cancel" onclick="closeConfirmModal()">חזרה לבדיקה</button>
+                <button class="modal-btn btn-confirm" onclick="finalSubmit()">הגש סופית</button>
+            </div>
+        </div>
+    </div>
+<!-- Game View Elements -->
+    <div id="ir-overlay"></div>
+    <div id="spectrum-es-bar"></div>
+    <div id="spectrum-ir-bar"></div>
+    <button id="submit-btn" onclick="openConfirmModal()">הגש משימה</button>
+
+    <div id="tools-bar">
+        <div style="display:flex; flex-direction:column; align-items:center; pointer-events:auto;">
+            <div id="glasses-toggle" class="glasses-btn" onclick="toggleIR()" title="הפעל/כבה משקפי IR"></div>
+            <button id="help-btn" onclick="openLesson(0)" title="הסבר על שלב 1">!</button>
+        </div>
+    </div>
+
+    <div id="water-cup" title="כלי משקה">
+        <div class="cup-ruler">
+            <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+        </div>
+    </div>
+
+    <div id="central-screen">
+        <div id="hand-hour" class="clock-hand"></div>
+        <div id="hand-minute" class="clock-hand"></div>
+        <div class="clock-center-dot"></div>
+    </div>
+
+    <div id="slots-row"></div>
+    
+    <div class="water-guide-label">
+        <span style="width: 80px; text-align: right;">צריך הכי פחות מים</span>
+        <span style="width: 80px; text-align: left;">צריך הכי הרבה מים</span>
+    </div>
+
+    <!-- Stage 2 Transition Screen Card -->
+    <div id="s2-transition-card" aria-hidden="true">
+        <div class="s2-transition-box">
+            <div class="stage-flow">
+                <div class="stage-flow-item"><div class="stage-flow-dot">3</div><span>סריקת ספקטרום</span></div>
+                <div class="stage-flow-line"></div>
+                <div class="stage-flow-item active"><div class="stage-flow-dot">2</div><span>מעבדת תפיסה</span></div>
+                <div class="stage-flow-line active"></div>
+                <div class="stage-flow-item"><div class="stage-flow-dot">1</div><span>סימולטור אינפרא אדום</span></div>
+            </div>
+            <div class="tut-step-num">שלב 2</div>
+            <div class="tut-main-title">מעבדת התפיסה</div>
+            <div class="tut-sub-desc">ברוכים הבאים למחלקת אור של תחנת קוונטום.</div>
+        </div>
+    </div>
+
+    <!-- Stage 2 Screen Container -->
+    <div id="stage2-screen" aria-label="מעבדת התפיסה">
+        <div id="s2-room-overlay"></div>
+
+        <div id="task-timer">15</div>
+        <div id="task-square"></div>
+
+        <div id="color-comparison-container">
+            <div class="comparison-img-box">
+                <span>ראייה רגילה</span>
+                <img src="QnormalV.png" alt="ראייה רגילה">
+            </div>
+            <div class="comparison-img-box">
+                <span>עיוורון צבעים (טריטנופיה)</span>
+                <img src="QTrinotopia.png" alt="טריטנופיה">
+            </div>
+        </div>
+
+        <div id="cards-container"></div>
+
+        <img id="s2-wall" src="qback2.png" alt="קיר המעבדה" draggable="false">
+
+        <div id="s2-danny-scene">
+            <div class="s2-danny" id="s2-danny" aria-label="דני">
+                <svg viewBox="0 0 245 340" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="s2Shirt" x1="0" y1="0" x2="1" y2="1">
+                            <stop stop-color="#1e3a8a"/><stop offset="1" stop-color="#0f172a"/>
+                        </linearGradient>
+                        <linearGradient id="s2Skin" x1="0" y1="0" x2="0" y2="1">
+                            <stop stop-color="#f8b4a6"/><stop offset="1" stop-color="#e0927e"/>
+                        </linearGradient>
+                        <linearGradient id="s2LightBrownHair" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stop-color="#a47551"/>
+                            <stop offset="100%" stop-color="#5a3d28"/>
+                        </linearGradient>
+                    </defs>
+
+                    <path d="M48 334 C50 260 75 230 102 220 L143 220 C170 230 195 260 197 334Z" fill="url(#s2Shirt)" stroke="#38bdf8" stroke-width="1.5"/>
+                    <path d="M98 220 L122 260 L147 220 L135 213 L110 213Z" fill="#f8fafc" opacity=".95"/>
+                    <path d="M122 258 L124 333" stroke="#38bdf8" stroke-opacity=".4" stroke-width="2"/>
+                    
+                    <path d="M100 198 L102 230 Q122 240 142 230 L144 198Z" fill="url(#s2Skin)"/>
+
+                    <ellipse cx="74" cy="138" rx="11" ry="17" fill="#e0927e"/>
+                    <ellipse cx="172" cy="138" rx="11" ry="17" fill="#e0927e"/>
+                    <ellipse cx="123" cy="130" rx="54" ry="76" fill="url(#s2Skin)" stroke="#c77b68" stroke-width="1.5"/>
+
+                    <path d="M69 110 Q68 50 123 46 Q178 50 177 110 Q165 72 145 68 Q123 60 101 68 Q81 72 69 110Z" fill="url(#s2LightBrownHair)"/>
+                    <path d="M85 75 Q123 55 161 75" fill="none" stroke="#b8865e" stroke-width="3" stroke-linecap="round" opacity=".7"/>
+
+                    <g fill="none" stroke="#38bdf8" stroke-width="2" opacity=".95">
+                        <circle cx="99" cy="136" r="18"/><circle cx="147" cy="136" r="18"/>
+                        <path d="M117 135 Q123 131 129 135"/><path d="M81 132 L72 129"/><path d="M165 132 L174 129"/>
+                    </g>
+                    <g opacity=".25" fill="#fff"><ellipse cx="93" cy="130" rx="8" ry="4"/><ellipse cx="141" cy="130" rx="8" ry="4"/></g>
+
+                    <g id="s2-base-eyes">
+                        <ellipse cx="99" cy="136" rx="5" ry="6" fill="#0f172a"/>
+                        <ellipse cx="147" cy="136" rx="5" ry="6" fill="#0f172a"/>
+                        <circle cx="97.5" cy="134" r="1.5" fill="#fff"/><circle cx="145.5" cy="134" r="1.5" fill="#fff"/>
+                    </g>
+
+                    <g id="s2-up-eyes" style="display: none;">
+                        <ellipse cx="99" cy="128" rx="5" ry="6" fill="#0f172a"/>
+                        <ellipse cx="147" cy="128" rx="5" ry="6" fill="#0f172a"/>
+                        <circle cx="97.5" cy="126" r="1.5" fill="#fff"/><circle cx="145.5" cy="126" r="1.5" fill="#fff"/>
+                    </g>
+
+                    <g id="s2-wink-eyes" style="display: none;">
+                        <ellipse cx="99" cy="136" rx="5" ry="6" fill="#0f172a"/>
+                        <circle cx="97.5" cy="134" r="1.5" fill="#fff"/>
+                        <path d="M139 136 Q147 128 155 136" fill="none" stroke="#0f172a" stroke-width="2" stroke-linecap="round"/>
+                    </g>
+
+                    <g id="s2-blink-lids" fill="#e0927e" pointer-events="none">
+                        <path id="left-lid" d="M84 136 Q99 120 114 136 Q99 145 84 136Z" opacity="0"/>
+                        <path id="right-lid" d="M132 136 Q147 120 162 136 Q147 145 132 136Z" opacity="0"/>
+                    </g>
+
+                    <g id="s2-expression-neutral" opacity="1">
+                        <path d="M86 111 Q99 104 111 111" fill="none" stroke="#4a311f" stroke-width="3" stroke-linecap="round"/>
+                        <path d="M135 111 Q148 104 160 111" fill="none" stroke="#4a311f" stroke-width="3" stroke-linecap="round"/>
+                        <path d="M108 178 Q123 184 138 178" fill="none" stroke="#7f3f3b" stroke-width="3" stroke-linecap="round"/>
+                    </g>
+
+                    <g id="s2-expression-doubt" opacity="0">
+                        <path d="M86 111 Q99 104 111 111" fill="none" stroke="#4a311f" stroke-width="3" stroke-linecap="round"/>
+                        <path d="M135 106 Q148 98 160 106" fill="none" stroke="#4a311f" stroke-width="3" stroke-linecap="round"/>
+                        <path d="M110 179 Q123 176 136 181" fill="none" stroke="#7f3f3b" stroke-width="3" stroke-linecap="round"/>
+                    </g>
+
+                    <g id="s2-expression-smile" opacity="0">
+                        <path d="M86 111 Q99 104 111 111" fill="none" stroke="#4a311f" stroke-width="3" stroke-linecap="round"/>
+                        <path d="M135 111 Q148 104 160 111" fill="none" stroke="#4a311f" stroke-width="3" stroke-linecap="round"/>
+                        <path d="M104 175 Q123 192 142 175" fill="none" stroke="#7f3f3b" stroke-width="3.5" stroke-linecap="round"/>
+                    </g>
+
+                    <path d="M121 136 Q115 157 124 160 Q130 161 134 156" fill="none" stroke="#b06c59" stroke-width="2"/>
+                    <rect x="154" y="276" width="27" height="32" rx="4" fill="#0f172a" stroke="#38bdf8" stroke-opacity=".5"/>
+                    <circle cx="167.5" cy="286" r="4" fill="#38bdf8" opacity=".8"/>
+                    <path d="M160 296h15" stroke="#38bdf8" stroke-opacity=".6"/>
+                </svg>
+            </div>
+        </div>
+
+        <img id="s2-desk" src="qback1.png" alt="שולחן המעבדה" draggable="false">
+
+        <div id="s2-dialogue" class="s2-dialogue">
+            <div class="s2-dialogue-box">
+                <div class="s2-speaker">דני</div>
+                <div class="s2-text-container">
+                    <div id="s2-text" class="s2-text"></div>
+                </div>
+                <div id="s2-choices" class="s2-choices"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // יצירת כוכבים רקע אקראיים במסך הפתיחה
+    const introScreen = document.getElementById('intro-screen');
+    for (let i = 0; i < 45; i++) {
+        const star = document.createElement('div');
+        star.className = 'star';
+        const size = Math.random() * 2.5 + 1;
+        star.style.width = size + 'px';
+        star.style.height = size + 'px';
+        star.style.top = Math.random() * 100 + '%';
+        star.style.left = Math.random() * 100 + '%';
+        star.style.animationDelay = (Math.random() * 3) + 's';
+        introScreen.appendChild(star);
+    }
+
+    let plants = [
+        { id: 0, src: 'cactusV.png', irBase: 'cactusIR', water: 50, optimalWater: 20 },
+        { id: 1, src: 'SucculentV.png', irBase: 'SucculentIR', water: 50, optimalWater: 40 },
+        { id: 2, src: 'leavesV.png', irBase: 'leavesIR', water: 50, optimalWater: 60 },
+        { id: 3, src: 'sunflowerV.png', irBase: 'sunflowerIR', water: 50, optimalWater: 100 },
+        { id: 4, src: 'orchidV.png', irBase: 'orchidIR', water: 50, optimalWater: 80 }
+    ];
+
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+    }
+    shuffleArray(plants);
+
+    let isIRActive = false;
+    let wateringTimer = null;
+    let targetWateringIndex = null;
+    let gameActive = false;
+
+    function openLabTutorial() {
+        const introScreen = document.getElementById('intro-screen');
+        const overlay = document.getElementById('tutorial-overlay');
+        introScreen.style.opacity = '0';
+        setTimeout(() => {
+            introScreen.style.display = 'none';
+            overlay.style.display = 'flex';
+            // The stage-entry card is informational only; it closes automatically.
+            setTimeout(closeLabTutorial, 3000);
+        }, 800);
+    }
+
+    function closeLabTutorial() {
+        const overlay = document.getElementById('tutorial-overlay');
+        const box = document.getElementById('tutorial-box');
+        if (overlay.style.display === 'none') return;
+        box.style.transform = 'scale(1.04)';
+        box.style.opacity = '0';
+        setTimeout(() => {
+            overlay.style.display = 'none';
+            box.style.transform = '';
+            box.style.opacity = '';
+            startLabSession();
+            setTimeout(() => openLesson(0), 180);
+        }, 420);
+    }
+
+    const lessonSteps = [
+        {
+            title:'כך מתחילים',
+            text:'גררו את המשקה מצד ימין למסך והשקו את הצמחים. מד המים שמתחת לצמח מתמלא בהתאם לכמות המים.',
+            plant:'v', meter:'normal', fill:88, animation:'water'
+        },
+        {
+            title:'עוברים לראייה אינפרא אדומה',
+            text:'בראייה אינפרא אדומה ניתן לראות מה הטמפרטורה של כל צמח. אם הצמח בגוון כחול בהיר, הטמפרטורה של הצמח טובה.',
+            plant:'n', meter:'ir', fill:88, animation:'glasses'
+        },
+        {
+            title:'יותר מדי מים',
+            text:'אם הצמח בגוון כהה מדי, הטמפרטורה שלו נמוכה והוא קיבל יותר מדי מים.',
+            plant:'t', meter:'ir', fill:88, animation:'none'
+        },
+        {
+            title:'מעט מדי מים',
+            text:'אם הצמח בגוון אדום, צהוב או כתום, הטמפרטורה שלו גבוהה והוא יבש מדי.',
+            plant:'h', meter:'ir', fill:28, animation:'none'
+        },
+        {
+            title:'מצליבים את המידע',
+            text:'באינפרא אדום המים כהים, לכן כדי לדעת את כמות המים בהתאם לבריאות הצמחים צריך להצליב מידע בין ראייה רגילה לאינפרא אדומה.',
+            plant:'n', meter:'ir', fill:88, animation:'spectrum'
+        },
+        {
+            title:'מסדרים את הצמחים',
+            text:'אחרי שהבנתם את מצב הצמח, מסדרים את הצמחים במקום הנכון באמצעות גרירה.',
+            plant:'v', meter:'normal', fill:88, animation:'drag'
+        }
+    ];
+    let lessonIndex = 0;
+
+    function openLesson(index=0) {
+        lessonIndex = Math.max(0, Math.min(index, lessonSteps.length - 1));
+        const overlay = document.getElementById('lesson-overlay');
+        overlay.style.display = 'flex';
+        overlay.setAttribute('aria-hidden','false');
+        renderLesson(true);
+    }
+
+    function closeLesson() {
+        const overlay = document.getElementById('lesson-overlay');
+        overlay.style.display = 'none';
+        overlay.setAttribute('aria-hidden','true');
+    }
+
+    function changeLesson(direction) {
+        const next = lessonIndex + direction;
+        if (next < 0 || next >= lessonSteps.length) return;
+        const textEl = document.getElementById('lesson-text');
+        textEl.style.opacity = '0';
+        textEl.style.transform = direction > 0 ? 'translateX(-12px)' : 'translateX(12px)';
+        setTimeout(() => {
+            lessonIndex = next;
+            renderLesson(false);
+            requestAnimationFrame(() => { textEl.style.opacity='1'; textEl.style.transform='translateX(0)'; });
+        }, 160);
+    }
+
+    function renderLesson(initial) {
+        const step = lessonSteps[lessonIndex];
+        const overlay = document.getElementById('lesson-overlay');
+        overlay.className = '';
+        overlay.classList.add(`step-${lessonIndex+1}`);
+
+        document.getElementById('lesson-title').textContent = step.title;
+        const textEl = document.getElementById('lesson-text');
+        textEl.textContent = step.text;
+        if (initial) { textEl.style.opacity='1'; textEl.style.transform='translateX(0)'; }
+
+        const images = {
+            v: document.getElementById('lesson-leaves-v'),
+            n: document.getElementById('lesson-leaves-n'),
+            t: document.getElementById('lesson-leaves-t'),
+            h: document.getElementById('lesson-leaves-h')
+        };
+        Object.entries(images).forEach(([key,img]) => {
+            img.style.opacity = key === step.plant ? '1' : '0';
+            img.style.transform = key === step.plant ? 'scale(1)' : 'scale(.97)';
+        });
+
+        const meter = document.getElementById('lesson-meter');
+        meter.classList.toggle('ir', step.meter === 'ir');
+        const fill = meter.querySelector('.lesson-meter-fill');
+        fill.style.transition = 'none';
+        fill.style.width = (lessonIndex === 0 ? 35 : 0) + '%';
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+            if (step.meter !== 'ir') {
+                fill.style.transition = 'width 1.1s cubic-bezier(.22,.8,.25,1)';
+                fill.style.width = step.fill + '%';
+            }
+        }));
+
+        const glasses = document.getElementById('lesson-glasses');
+        const isGlassesStep = step.animation === 'glasses';
+        glasses.style.animation = 'none';
+        glasses.style.display = isGlassesStep ? 'block' : 'none';
+        glasses.style.opacity = isGlassesStep ? '1' : '0';
+        glasses.style.visibility = isGlassesStep ? 'visible' : 'hidden';
+        glasses.style.transform = isGlassesStep ? 'scale(1)' : 'scale(.08)';
+        glasses.style.filter = '';
+        document.getElementById('lesson-cup').style.display = step.animation === 'water' ? 'block' : 'none';
+        document.getElementById('lesson-stream').style.display = step.animation === 'water' ? 'block' : 'none';
+        const dragDemo = document.getElementById('lesson-drag-demo');
+        dragDemo.classList.remove('play');
+        dragDemo.style.display = step.animation === 'drag' ? 'flex' : 'none';
+
+        document.getElementById('lesson-prev').disabled = lessonIndex === 0;
+        const nextBtn = document.getElementById('lesson-next');
+        nextBtn.disabled = false;
+        nextBtn.innerHTML = lessonIndex === lessonSteps.length-1 ? '×' : '›';
+        nextBtn.onclick = lessonIndex === lessonSteps.length-1 ? closeLesson : () => changeLesson(1);
+        document.getElementById('lesson-progress').textContent = `${lessonIndex+1} / ${lessonSteps.length}`;
+
+        void overlay.offsetWidth;
+        if (step.animation === 'water' || step.animation === 'glasses') {
+            overlay.classList.add('playing');
+        }
+        if (step.animation === 'drag') {
+            const demo = document.getElementById('lesson-drag-demo');
+            void demo.offsetWidth;
+            demo.classList.add('play');
+        }
+    }
+
+    let stage1StartTime = localStorage.getItem('stage1StartTime');
+    if (!stage1StartTime) {
+        stage1StartTime = Date.now();
+        localStorage.setItem('stage1StartTime', stage1StartTime);
+    }
+
+    let timerInterval = null;
+
+    function startLabSession() {
+        gameActive = true;
+        renderBoard();
+
+        timerInterval = setInterval(() => {
+            if (!gameActive) return;
+            let elapsedTimeSeconds = Math.floor((Date.now() - parseInt(stage1StartTime)) / 1000);
+
+            let minuteDeg = (elapsedTimeSeconds % 60) * 6; 
+            let hourDeg = (elapsedTimeSeconds / 10) % 360; 
+            
+            const minHand = document.getElementById('hand-minute');
+            const hourHand = document.getElementById('hand-hour');
+            if(minHand) minHand.style.transform = `translateX(-50%) rotate(${minuteDeg}deg)`;
+            if(hourHand) hourHand.style.transform = `translateX(-50%) rotate(${hourDeg}deg)`;
+        }, 1000);
+
+        setInterval(() => {
+            if (!gameActive) return;
+            plants.forEach((p, idx) => {
+                if (targetWateringIndex !== idx) {
+                    if (p.water > 0) {
+                        p.water = Math.max(0, p.water - 0.15);
+                    }
+                }
+            });
+            updateLiveValues();
+        }, 100);
+    }
+
+    function getSmoothOpacities(p) {
+        let w = p.water;
+        let opt = p.optimalWater;
+        let h = 0, n = 0, t = 0;
+        let midPoint = opt / 2;
+        
+        if (w <= midPoint) {
+            let ratio = opt > 0 ? (w / midPoint) : 1;
+            h = Math.max(0, 1 - ratio);
+            n = Math.min(1, ratio);
+            t = 0;
+        } else if (w <= opt) {
+            let ratio = (w - midPoint) / (opt - midPoint);
+            h = 0;
+            n = Math.max(0, 1 - ratio);
+            t = Math.min(1, ratio);
+        } else {
+            h = 0; n = 0; t = 1;
+        }
+        return { h, n, t };
+    }
+
+    function getPlantVisualStyle(p) {
+        if (!isIRActive) return "filter: drop-shadow(0 0 2px rgba(0,0,0,0.5));";
+        return "filter: none;";
+    }
+
+    function renderBoard() {
+        const row = document.getElementById('slots-row');
+        row.innerHTML = '';
+        plants.forEach((p, idx) => {
+            const slot = document.createElement('div');
+            slot.className = 'plant-slot';
+            if (targetWateringIndex === idx) slot.classList.add('watering-active');
+
+            slot.draggable = true;
+            slot.addEventListener('dragstart', (e) => e.dataTransfer.setData('text/plain', 'plant_' + idx));
+            slot.addEventListener('dragover', (e) => e.preventDefault());
+            slot.addEventListener('drop', (e) => {
+                e.preventDefault();
+                const data = e.dataTransfer.getData('text/plain');
+                if (data.startsWith('plant_')) {
+                    const fromIdx = parseInt(data.split('_')[1]);
+                    if (fromIdx !== idx) {
+                        let temp = plants[fromIdx];
+                        plants[fromIdx] = plants[idx];
+                        plants[idx] = temp;
+                        renderBoard();
+                    }
+                }
+            });
+
+            let visualStyle = getPlantVisualStyle(p);
+            let innerMarkup = '';
+            if (!isIRActive) {
+                innerMarkup = `<div class="plant-container" style="${visualStyle}"><img src="${p.src}" class="plant-layer" style="opacity: 1;" alt="plant"></div>`;
+            } else {
+                let op = getSmoothOpacities(p);
+                innerMarkup = `
+                    <div class="plant-container" style="${visualStyle}">
+                        <img src="${p.irBase}H.png" class="plant-layer" style="opacity: ${op.h};" alt="plant H">
+                        <img src="${p.irBase}N.png" class="plant-layer" style="opacity: ${op.n};" alt="plant N">
+                        <img src="${p.irBase}T.png" class="plant-layer" style="opacity: ${op.t};" alt="plant T">
+                    </div>
+                `;
+            }
+
+            slot.innerHTML = `
+                ${innerMarkup}
+                <div class="water-meter-container" title="רמת מים: ${Math.floor(p.water)}%">
+                    <div class="water-meter-fill" style="width: ${p.water}%;"></div>
+                </div>
+            `;
+            row.appendChild(slot);
+        });
+    }
+
+    function updateLiveValues() {
+        const slots = document.querySelectorAll('.plant-slot');
+        plants.forEach((p, idx) => {
+            if (slots[idx]) {
+                const fill = slots[idx].querySelector('.water-meter-fill');
+                if (fill) fill.style.width = p.water + '%';
+                slots[idx].querySelector('.water-meter-container').title = `רמת מים: ${Math.floor(p.water)}%`;
+
+                const containerEl = slots[idx].querySelector('.plant-container');
+                if (containerEl) {
+                    containerEl.style.cssText = `position: relative; width: 75px; height: 75px; margin-bottom: 8px; ${getPlantVisualStyle(p)}`;
+                    if (isIRActive) {
+                        let op = getSmoothOpacities(p);
+                        let imgs = containerEl.querySelectorAll('.plant-layer');
+                        if (imgs.length >= 3) {
+                            imgs[0].style.opacity = op.h;
+                            imgs[1].style.opacity = op.n;
+                            imgs[2].style.opacity = op.t;
+                        } else { renderBoard(); }
+                    } else {
+                        let imgEl = containerEl.querySelector('.plant-layer');
+                        if (imgEl && imgEl.getAttribute('src') !== p.src) imgEl.setAttribute('src', p.src);
+                    }
+                }
+            }
+        });
+    }
+
+    const cup = document.getElementById('water-cup');
+    const container = document.getElementById('game-container');
+    let isDraggingCup = false, initialX, initialY, currentX = 0, currentY = 0;
+
+    cup.addEventListener('pointerdown', (e) => {
+        isDraggingCup = true;
+        cup.setPointerCapture(e.pointerId);
+        initialX = e.clientX - currentX;
+        initialY = e.clientY - currentY;
+    });
+
+    cup.addEventListener('pointermove', (e) => {
+        if (!isDraggingCup) return;
+        currentX = e.clientX - initialX;
+        currentY = e.clientY - initialY;
+        cup.style.transform = `translate(${currentX}px, ${currentY}px) rotate(12deg)`;
+
+        let foundIdx = null;
+        document.querySelectorAll('.plant-slot').forEach((slot, idx) => {
+            const rect = slot.getBoundingClientRect();
+            if (e.clientX >= rect.left && e.clientX <= rect.right && e.clientY >= rect.top && e.clientY <= rect.bottom) {
+                foundIdx = idx;
+            }
+        });
+
+        if (foundIdx !== null) {
+            if (targetWateringIndex !== foundIdx) startWatering(foundIdx);
+            createWaterParticle(e.clientX, e.clientY);
+        } else {
+            stopWatering();
+        }
+    });
+
+    function resetCupPosition() {
+        isDraggingCup = false;
+        currentX = 0; currentY = 0;
+        cup.style.transform = 'translate(0px, 0px) rotate(0deg)';
+        stopWatering();
+    }
+    cup.addEventListener('pointerup', resetCupPosition);
+    cup.addEventListener('pointercancel', resetCupPosition);
+
+    function createWaterParticle(x, y) {
+        const gameRect = container.getBoundingClientRect();
+        const particle = document.createElement('div');
+        particle.className = 'water-particle';
+        particle.style.left = (x - gameRect.left) + 'px';
+        particle.style.top = (y - gameRect.top + 10) + 'px';
+        particle.style.setProperty('--rand-x', ((Math.random() - 0.5) * 30) + 'px');
+        container.appendChild(particle);
+        setTimeout(() => particle.remove(), 600);
+    }
+
+    function startWatering(idx) {
+        if (targetWateringIndex === idx) return;
+        stopWatering();
+        targetWateringIndex = idx;
+        renderBoard();
+
+        wateringTimer = setInterval(() => {
+            if (plants[idx].water < 100) {
+                plants[idx].water = Math.min(100, plants[idx].water + (100 / 30));
+                updateLiveValues();
+                if (plants[idx].water >= 100) stopWatering();
+            } else {
+                stopWatering();
+            }
+        }, 100);
+    }
+
+    function stopWatering() {
+        if (wateringTimer) { clearInterval(wateringTimer); wateringTimer = null; }
+        if (targetWateringIndex !== null) { targetWateringIndex = null; renderBoard(); }
+    }
+
+    function toggleIR() {
+        isIRActive = !isIRActive;
+        const container = document.getElementById('game-container');
+        const glassesBtn = document.getElementById('glasses-toggle');
+        if (isIRActive) {
+            container.classList.add('ir-mode');
+            glassesBtn.classList.add('active');
+        } else {
+            container.classList.remove('ir-mode');
+            glassesBtn.classList.remove('active');
+        }
+        renderBoard();
+    }
+
+    function openConfirmModal() {
+        document.getElementById('confirm-modal').style.display = 'flex';
+    }
+
+    function closeConfirmModal() {
+        document.getElementById('confirm-modal').style.display = 'none';
+    }
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && document.getElementById('lesson-overlay').style.display === 'flex') closeLesson();
+        if (e.key === 'ArrowLeft' && document.getElementById('lesson-overlay').style.display === 'flex') changeLesson(1);
+        if (e.key === 'ArrowRight' && document.getElementById('lesson-overlay').style.display === 'flex') changeLesson(-1);
+    });
+
+    /* --- Transition between Stage 1 & Stage 2 --- */
+    function finalSubmit() {
+        closeConfirmModal();
+        gameActive = false;
+        clearInterval(timerInterval);
+
+        const finalDuration = Math.floor((Date.now() - parseInt(stage1StartTime)) / 1000);
+        localStorage.setItem('stage1Time', finalDuration);
+        localStorage.setItem('stage1Completed', 'true');
+
+        // Correct plant order is lowest optimal water requirement to highest.
+        const correctOrder = [...plants].slice().sort((a,b) => a.optimalWater - b.optimalWater).map(p => p.id);
+        const userOrder = plants.map(p => p.id);
+        const correctPlants = userOrder.reduce((n,id,i) => n + (id === correctOrder[i] ? 1 : 0), 0);
+        const stage1Score = correctPlants * 20;
+        localStorage.setItem('stage1Score', String(stage1Score));
+        localStorage.setItem('stage1UserOrder', JSON.stringify(userOrder));
+        localStorage.setItem('stage1CorrectOrder', JSON.stringify(correctOrder));
+
+        const statusScreen = document.getElementById('status-screen');
+        if (statusScreen) statusScreen.style.display = 'none';
+
+        const transitionCard = document.getElementById('s2-transition-card');
+        const stage2Screen = document.getElementById('stage2-screen');
+        if (transitionCard) {
+            transitionCard.style.display = 'flex';
+            transitionCard.setAttribute('aria-hidden', 'false');
+            setTimeout(() => {
+                transitionCard.style.display = 'none';
+                transitionCard.setAttribute('aria-hidden', 'true');
+                if (stage2Screen) {
+                    stage2Screen.style.display = 'block';
+                    stage2Init();
+                }
+            }, 3000);
+        } else if (stage2Screen) {
+            stage2Screen.style.display = 'block';
+            stage2Init();
+        }
+    }
+
+    /* --- Stage 2 Logic --- */
+    const textElement = document.getElementById("s2-text");
+    const choicesContainer = document.getElementById("s2-choices");
+    const dialogueBox = document.getElementById("s2-dialogue");
+    const roomOverlay = document.getElementById("s2-room-overlay");
+    const taskSquare = document.getElementById("task-square");
+    const taskTimer = document.getElementById("task-timer");
+    const baseEyes = document.getElementById("s2-base-eyes");
+    const upEyes = document.getElementById("s2-up-eyes");
+    const winkEyes = document.getElementById("s2-wink-eyes");
+    const exprNeutral = document.getElementById("s2-expression-neutral");
+    const exprDoubt = document.getElementById("s2-expression-doubt");
+    const exprSmile = document.getElementById("s2-expression-smile");
+    const comparisonContainer = document.getElementById("color-comparison-container");
+    const cardsContainer = document.getElementById("cards-container");
+
+    let isBlinkingActive = true;
+    let userPurpleChoices = [];
+
+    function setExpression(type) {
+        exprNeutral.setAttribute("opacity", type === 'neutral' ? "1" : "0");
+        exprDoubt.setAttribute("opacity", type === 'doubt' ? "1" : "0");
+        exprSmile.setAttribute("opacity", type === 'smile' ? "1" : "0");
+    }
+
+    function typeWriter(text, callback) {
+        textElement.innerHTML = "";
+        let charIndex = 0;
+        function type() {
+            if (charIndex < text.length) {
+                textElement.innerHTML += text.charAt(charIndex);
+                charIndex++;
+                setTimeout(type, 30);
+            } else if (callback) {
+                callback();
+            }
+        }
+        type();
+    }
+
+    function setChoices(choicesArray) {
+        choicesContainer.innerHTML = "";
+        choicesArray.forEach(choice => {
+            const btn = document.createElement("button");
+            btn.className = "s2-choice";
+            if (choice.id) btn.id = choice.id;
+            btn.innerText = choice.text;
+            if (choice.disabled) btn.disabled = true;
+            btn.onclick = choice.action;
+            choicesContainer.appendChild(btn);
+        });
+    }
+
+    function stage2Init(){
+        roomOverlay.style.opacity = "1";
+        
+        setTimeout(() => {
+            roomOverlay.style.opacity = "0";
+            startBlinking();
+
+            setTimeout(() => {
+                step1();
+            }, 800);
+        }, 1000);
+    }
+
+    function startBlinking() {
+        const leftLid = document.getElementById("left-lid");
+        const rightLid = document.getElementById("right-lid");
+
+        function blink() {
+            if (!isBlinkingActive) return;
+            leftLid.setAttribute("opacity", "1");
+            rightLid.setAttribute("opacity", "1");
+            baseEyes.style.display = "none";
+            upEyes.style.display = "none";
+            winkEyes.style.display = "none";
+
+            setTimeout(() => {
+                if (!isBlinkingActive) return;
+                leftLid.setAttribute("opacity", "0");
+                rightLid.setAttribute("opacity", "0");
+                baseEyes.style.display = "block";
+
+                const nextBlink = Math.random() * 1000 + 3000;
+                setTimeout(blink, nextBlink);
+            }, 150);
+        }
+        setTimeout(blink, Math.random() * 1000 + 3000);
+    }
+
+    function step1() {
+        setExpression('neutral');
+        typeWriter("כבר הגעת לשלב השני?", () => {
+            setChoices([
+                { text: "כן", action: () => handleStep1("yes") },
+                { text: "אני הולוגרמה", action: () => handleStep1("holo") },
+                { text: "מי אתה", action: () => handleStep1("who") }
+            ]);
+        });
+    }
+
+    function handleStep1(ans) {
+        choicesContainer.innerHTML = "";
+        let reply = "";
+        if (ans === "yes") reply = "נהדר, אז ברוך הבא למעבדות קוונטום.";
+        else if (ans === "holo") reply = "מדהים! הולוגרמות הן מכניקות של אור.";
+        else if (ans === "who") reply = "אני דני, ראש מחלקת אור במעבדות קוונטום.";
+
+        typeWriter(reply, () => {
+            setChoices([{ text: "המשך", action: step2 }]);
+        });
+    }
+
+    function step2() {
+        choicesContainer.innerHTML = "";
+        setExpression('neutral');
+        typeWriter("כאן במחלקת אור אנחנו חוקרים תופעות שקשורות לאור, ידעת שלמעשה צבע בכלל לא קיים ביקום?", () => {
+            setChoices([
+                { text: "הוא קיים, אבל רק בראש שלך", action: () => handleStep2("exists") },
+                { text: "שמעתי משהו כזה", action: () => handleStep2("heard") }
+            ]);
+        });
+    }
+
+    function handleStep2(ans) {
+        choicesContainer.innerHTML = "";
+        let reply = (ans === "heard") ? "נהדר! אז בוא נראה למה" : "בדיוק! הוא קיים רק בראש שלך.";
+        typeWriter(reply, () => {
+            setChoices([{ text: "המשך", action: startTask1 }]);
+        });
+    }
+
+    function startTask1() {
+        choicesContainer.innerHTML = "";
+        taskSquare.style.backgroundColor = "#00ff22";
+        taskSquare.style.borderColor = "#00ff22";
+        taskSquare.style.boxShadow = "0 0 30px rgba(0, 255, 34, 0.6)";
+
+        setExpression('neutral');
+        typeWriter("הבט בריבוע הירוק בלי לפזול ותשתדל לא למצמץ. מוכן?", () => {
+            setChoices([
+                { 
+                    text: "קדימה!", 
+                    action: () => {
+                        choicesContainer.innerHTML = "";
+                        dialogueBox.style.opacity = "0";
+                        
+                        isBlinkingActive = false;
+                        baseEyes.style.display = "none";
+                        upEyes.style.display = "block";
+                        document.getElementById("left-lid").setAttribute("opacity", "0");
+                        document.getElementById("right-lid").setAttribute("opacity", "0");
+
+                        taskSquare.style.display = "block";
+                        taskTimer.style.display = "block";
+                        
+                        let timeLeft = 15;
+                        taskTimer.innerText = timeLeft;
+
+                        let timerInterval = setInterval(() => {
+                            timeLeft--;
+                            taskTimer.innerText = timeLeft;
+                            if (timeLeft <= 0) {
+                                clearInterval(timerInterval);
+                                
+                                taskSquare.style.backgroundColor = "rgba(255, 255, 255, 0.95)";
+                                taskSquare.style.borderColor = "#ffffff";
+                                taskSquare.style.boxShadow = "0 0 35px rgba(255, 255, 255, 0.8)";
+                                taskTimer.style.display = "none";
+
+                                setTimeout(() => {
+                                    taskSquare.style.display = "none";
+                                    upEyes.style.display = "none";
+                                    winkEyes.style.display = "none";
+                                    baseEyes.style.display = "block";
+                                    isBlinkingActive = true;
+                                    startBlinking();
+
+                                    dialogueBox.style.opacity = "1";
+                                    askTaskResult();
+                                }, 3000);
+                            }
+                        }, 1000);
+                    } 
+                }
+            ]);
+        });
+    }
+
+    function askTaskResult() {
+        typeWriter("כשהריבוע הוחלף ללבן, הבחנת בצבע מסוים שהופיע?", () => {
+            setChoices([
+                { text: "כן! הצלחתי!", action: () => handleResult("yes") },
+                { text: "לא ראיתי כלום", action: () => handleResult("no") }
+            ]);
+        });
+    }
+
+    function handleResult(res) {
+        choicesContainer.innerHTML = "";
+        if (res === "yes") {
+            setExpression('neutral');
+            typeWriter("מדהים! גרמנו לקולטן הירוק שלנו להתעייף, כך שהאדום והכחול פעלו חזק יותר וגרמו לשילוב בינהם - צבע ורוד סגלגל.", () => {
+                setChoices([{ text: "המשך", action: dannyStory }]);
+            });
+        } else {
+            setExpression('doubt');
+            typeWriter("כנראה שלא התרכזת מספיק, תרצה לנסות שוב?", () => {
+                setChoices([
+                    { 
+                        text: "כן", 
+                        action: () => { 
+                            setExpression('neutral');
+                            startTask1(); 
+                        } 
+                    },
+                    { 
+                        text: "לא תודה", 
+                        action: () => { 
+                            setExpression('neutral');
+                            choicesContainer.innerHTML = "";
+                            dannyStory(); 
+                        } 
+                    }
+                ]);
+            });
+        }
+    }
+
+    function dannyStory() {
+        choicesContainer.innerHTML = "";
+        typeWriter("עכשיו כדאי שאספר לך משהו עלי. יש לי עיוורון צבעים מסוג טריטנופיה, זה אומר שאין לי קולטן צבע כחול.", () => {
+            setChoices([{ 
+                text: "המשך", 
+                action: () => {
+                    choicesContainer.innerHTML = "";
+                    comparisonContainer.style.display = "flex";
+                    typeWriter("להמחשה כך אני רואה לעומת בן אדם עם ראייה רגילה", () => {
+                        setChoices([
+                            { 
+                                text: "איך אתה מבדיל בין כחול לירוק?", 
+                                action: () => {
+                                    comparisonContainer.style.display = "none";
+                                    handleDannyAnswers("diff");
+                                } 
+                            },
+                            { 
+                                text: "אז אף פעם לא ראית כחול?", 
+                                action: () => {
+                                    comparisonContainer.style.display = "none";
+                                    handleDannyAnswers("never");
+                                } 
+                            }
+                        ]);
+                    });
+                } 
+            }]);
+        });
+    }
+
+    function handleDannyAnswers(type) {
+        choicesContainer.innerHTML = "";
+        let reply = (type === "diff") 
+            ? "אני לא ממש מבדיל בינהם, אני לא יכול לזהות מתי בננה בשלה למשל." 
+            : "ראיתי כחול, אני תמיד רואה כחול אבל לא את אותו כחול שאתה רואה.";
+
+        typeWriter(reply, () => {
+            setChoices([{ text: "המשך", action: dannyStoryPart2 }]);
+        });
+    }
+
+    function dannyStoryPart2() {
+        choicesContainer.innerHTML = "";
+        typeWriter("עיוורון הצבעים שלי גורם לי לראות פחות הבדלים בין הצבעים, כמו שאתה לא תמיד מבדיל בין מלח לסוכר, כולנו עיוורי צבעים אבל ברמות שונות.", () => {
+            setChoices([{ 
+                text: "המשך", 
+                action: () => {
+                    choicesContainer.innerHTML = "";
+                    typeWriter("עוד צבעים הם עוד הבדלים, כמו שבסימולטור האינפרא אדום יכלת לזהות הבדלים בטמפרטורה של הצמחים.", () => {
+                        setChoices([{ 
+                            text: "המשך", 
+                            action: () => {
+                                choicesContainer.innerHTML = "";
+                                typeWriter("עם ראייה רגילה אתה יכול להבין שצמח הולך להרקב רק כשזה כמעט מאוחר מדי.", () => {
+                                    setChoices([
+                                        { text: "אז איך באמת נראה אינפרא אדום?", action: () => handleInfra("how") },
+                                        { text: "נשמע מגניב", action: () => handleInfra("cool") }
+                                    ]);
+                                });
+                            } 
+                        }]);
+                    });
+                } 
+            }]);
+        });
+    }
+
+    function handleInfra(type) {
+        choicesContainer.innerHTML = "";
+        if (type === "how") {
+            typeWriter("מי שלא ראה אף פעם צבע לא יכול לדמיין אותו, מתארים אותו כמו ההמשך של אדום, כמו צבע רגוע וחמים.", () => {
+                setChoices([{ 
+                    text: "המשך", 
+                    action: () => {
+                        choicesContainer.innerHTML = "";
+                        startPurpleTask();
+                    } 
+                }]);
+            });
+        } else {
+            typeWriter("כן, ראייה היא דבר מדהים, העין בעצם מחביאה מאיתנו מידע, מה שמוביל אותי למשימה שלך.", () => {
+                setChoices([{ 
+                    text: "המשך", 
+                    action: () => {
+                        choicesContainer.innerHTML = "";
+                        startPurpleTask();
+                    } 
+                }]);
+            });
+        }
+    }
+
+    function startPurpleTask() {
+        choicesContainer.innerHTML = "";
+        dialogueBox.style.opacity = "0";
+        userPurpleChoices = [];
+
+        const cardTexts = [
+            "סגול הוא כמו צבע אדום שכיבו לו את האש",
+            "סגול מעלה תחושה של מסתורין, מלכותיות ורוגע עמוק",
+            "סגול הוא הצבע של ענבים או או חצילים בטבע",
+            "כמו שכתום הוא ההמשך של אדום, סגול הוא ההמשך הישיר של כחול.",
+            "סגול הוא כמו שילוב בין תחושה של חום לבין קור",
+            "סגול הוא הצבע של השמיים ברגע שבין הלילה לכחול של הבוקר."
+        ];
+
+        cardsContainer.innerHTML = "";
+        cardTexts.forEach((txt) => {
+            const card = document.createElement("div");
+            card.className = "purple-card";
+            card.innerText = txt;
+            card.onclick = () => toggleCard(card, txt);
+            cardsContainer.appendChild(card);
+        });
+
+        cardsContainer.style.display = "flex";
+        dialogueBox.style.opacity = "1";
+        typeWriter("נסה לתאר לי איך נראה הצבע סגול, בחר את 3 התיאורים הכי טובים. (0/3)", () => {
+            setChoices([
+                { text: "שליחה", id: "submit-purple", disabled: true, action: submitPurpleTask }
+            ]);
+        });
+    }
+
+    function toggleCard(cardElement, text) {
+        const index = userPurpleChoices.indexOf(text);
+        if (index > -1) {
+            userPurpleChoices.splice(index, 1);
+            cardElement.classList.remove("selected");
+        } else {
+            if (userPurpleChoices.length < 3) {
+                userPurpleChoices.push(text);
+                cardElement.classList.add("selected");
+            } else {
+                alert("ניתן לבחור עד 3 כרטיסיות בלבד. בטל בחירה של כרטיסייה אחרת קודם.");
+                return;
+            }
+        }
+
+        const submitBtn = document.getElementById("submit-purple");
+        if (submitBtn) {
+            submitBtn.disabled = (userPurpleChoices.length !== 3);
+        }
+        
+        textElement.innerText = `נסה לתאר לי איך נראה הצבע סגול, בחר את 3 התיאורים הכי טובים. (${userPurpleChoices.length}/3)`;
+    }
+
+    function submitPurpleTask() {
+        cardsContainer.style.display = "none";
+        choicesContainer.innerHTML = "";
+
+        isBlinkingActive = false;
+        baseEyes.style.display = "block";
+        upEyes.style.display = "none";
+        winkEyes.style.display = "none";
+        setExpression('neutral');
+
+        typeWriter("קיבלתי את ההסברים! אעבור עליהם, בינתיים אעביר אותך לסריקת הספקטרום, בהצלחה!", () => {
+            setChoices([{
+                text: "המשך",
+                action: () => {
+                    choicesContainer.innerHTML = "";
+                    setExpression('smile');
+                    baseEyes.style.display = "none";
+                    winkEyes.style.display = "block";
+
+                    roomOverlay.style.opacity = "1";
+                    localStorage.setItem('stage2UserChoices', JSON.stringify(userPurpleChoices));
+                    const correctDescriptions = [
+                        "סגול מעלה תחושה של מסתורין, מלכותיות ורוגע עמוק",
+                        "סגול הוא כמו שילוב בין תחושה של חום לבין קור",
+                        "סגול הוא כמו צבע אדום שכיבו לו את האש"
+                    ];
+                    const correctCount = userPurpleChoices.filter(x => correctDescriptions.includes(x)).length;
+                    const stage2Score = correctCount === 0 ? 0 : correctCount === 1 ? 50 : correctCount === 2 ? 75 : 100;
+                    localStorage.setItem('stage2Score', String(stage2Score));
+                    localStorage.setItem('stage2CorrectCount', String(correctCount));
+                    localStorage.setItem('stage2CorrectDescriptions', JSON.stringify(correctDescriptions));
+
+                    setTimeout(() => {
+                        winkEyes.style.display = "none";
+                        baseEyes.style.display = "block";
+                        setExpression('neutral');
+                        document.getElementById('stage2-screen').style.display = 'none';
+                        showStage3Transition();
+                    }, 650);
+                }
+            }]);
+        });
+    }
+</script>
+
+
+    <div id="s3-transition-card" class="s2-transition-card" aria-hidden="true" style="display:none;">
+        <div class="s2-transition-box">
+            <div class="stage-flow">
+                <div class="stage-flow-item active"><div class="stage-flow-dot">3</div><span>סריקת ספקטרום</span></div>
+                <div class="stage-flow-line active"></div>
+                <div class="stage-flow-item"><div class="stage-flow-dot">2</div><span>מעבדת תפיסה</span></div>
+                <div class="stage-flow-line"></div>
+                <div class="stage-flow-item"><div class="stage-flow-dot">1</div><span>סימולטור אינפרא אדום</span></div>
+            </div>
+            <div class="tut-step-num">שלב 3</div>
+            <div class="tut-main-title">סריקת ספקטרום</div>
+            <div class="tut-sub-desc">מעבדת התפיסה הושלמה. עכשיו עוברים לסריקה האחרונה.</div>
+        </div>
+    </div>
+
+    <div id="score-tension">
+      <div id="tension-content"></div>
+    </div>
+
+    <div id="final-results">
+      <div class="final-wrap">
+        <h1 class="final-title">מוכנים לקבל ניקוד?</h1>
+        <p class="final-sub"> תודה שהשתתפתם!</p>
+        <div class="final-card-preview" id="final-card-preview">
+          <img id="final-card-image" src="cardqend.png" alt="כרטיס תוצאות Quantum Station">
+          <div class="card-overlay-name" id="card-name">--</div>
+          <div class="card-overlay-scores" id="card-scores"></div>
+          <div class="card-overlay-total" id="card-total">-- / 300</div>
+          <div class="shine"></div>
+        </div>
+        <p class="share-caption">שתפו אותנו בתחנת קוונטום</p>
+        <p class="medical-note">המידע אינו מידע רפואי</p>
+        <div class="results-grid">
+          <section class="result-panel"><h3>סימולטור אינפרא אדום</h3><div class="score-big" id="detail-stage1-score">0 / 100</div><div id="stage1-order-detail"></div></section>
+          <section class="result-panel"><h3>מעבדת התפיסה</h3><div class="score-big" id="detail-stage2-score">0 / 100</div><div id="stage2-detail"></div></section>
+          <section class="result-panel"><h3>סריקת ספקטרום</h3><div class="score-big" id="detail-stage3-score">0 / 100</div><div id="stage3-detail"></div></section>
+        </div>
+      </div>
+    </div>
+
+
+    <div id="stage3-screen" class="stage3-hidden" style="display:none;">
+        <!-- אפקט החלל והערפילית הוזז לכאן כדי שיופיע אך ורק מתוך המסך -->
+        <div id="stars-bg"></div>
+
+        <div id="levels-header">
+            <span class="lvl-indicator" id="ind-1">רמה 1</span>
+            <span class="lvl-indicator" id="ind-2">רמה 2</span>
+            <span class="lvl-indicator" id="ind-3">רמה 3</span>
+            <span class="lvl-indicator" id="ind-4">רמה 4</span>
+        </div>
+
+        <div id="s3-room-overlay"></div>
+
+        <div id="screens-wrapper">
+            
+            <!-- שלב 0: פתיחה -->
+            <div class="sub-screen" id="screen-0">
+                <div class="title-box" style="margin-top: 50px;">
+                    <h1>ברוכים הבאים לסריקת הספקטרום!</h1>
+                    <p>
+                        בשלב זה נבחן את יכולת הזיהוי שלך. המסכים הבאים יציגו אובייקטים עם מספרים נסתרים. זהה אותם נכון כדי להתקדם.
+                    </p>
+                </div>
+                <div style="width: 100%; margin-bottom: 25px;">
+                    <button class="opt-btn" onclick="goToStep(1)" style="width: 100%; padding: 14px; font-size: 15px; background: rgba(22, 22, 22, 0.9); border-color: #444; color: #f3f4f6;">התחל בסריקה</button>
+                </div>
+            </div>
+
+            <!-- שלב 1: רמה 1 - ברווז -->
+            <div class="sub-screen" id="screen-1">
+                <div style="height: 5px;"></div>
+                <div class="center-content-box">
+                    <div class="item-header-title">סריקת פריט 1/4</div>
+                    <div class="item-viewport">
+                        <img src="duckl3.png" alt="פריט 1">
+                    </div>
+                    <div class="options-grid" id="opt-container-1"></div>
+                </div>
+                <div class="nav-buttons-row">
+                    <button class="action-btn" onclick="goToStep(0)">הקודם</button>
+                    <button class="action-btn" id="next-btn-1" disabled onclick="goToStep(2)">הבא</button>
+                </div>
+            </div>
+
+            <!-- שלב 2: רמה 2 - כד -->
+            <div class="sub-screen" id="screen-2">
+                <div style="height: 5px;"></div>
+                <div class="center-content-box">
+                    <div class="item-header-title">סריקת פריט 2/4</div>
+                    <div class="item-viewport">
+                        <img src="item2lvl3.png" alt="פריט 2">
+                    </div>
+                    <div class="options-grid" id="opt-container-2"></div>
+                </div>
+                <div class="nav-buttons-row">
+                    <button class="action-btn" onclick="goToStep(1)">הקודם</button>
+                    <button class="action-btn" id="next-btn-2" disabled onclick="goToStep(3)">הבא</button>
+                </div>
+            </div>
+
+            <!-- שלב 3: רמה 3 - טלפון -->
+            <div class="sub-screen" id="screen-3">
+                <div style="height: 5px;"></div>
+                <div class="center-content-box">
+                    <div class="item-header-title">סריקת פריט 3/4</div>
+                    <div class="item-viewport">
+                        <img src="item3lvl3.png" alt="פריט 3">
+                    </div>
+                    <div class="options-grid" id="opt-container-3"></div>
+                </div>
+                <div class="nav-buttons-row">
+                    <button class="action-btn" onclick="goToStep(2)">הקודם</button>
+                    <button class="action-btn" id="next-btn-3" disabled onclick="goToStep(4)">הבא</button>
+                </div>
+            </div>
+
+            <!-- שלב 4: רמה 4 - קוביה -->
+            <div class="sub-screen" id="screen-4">
+                <div style="height: 5px;"></div>
+                <div class="center-content-box">
+                    <div class="item-header-title">סריקת פריט 4/4</div>
+                    <div class="item-viewport">
+                        <img src="item4lvl3.png" alt="פריט 4">
+                    </div>
+                    <div class="options-grid" id="opt-container-4"></div>
+                </div>
+                <div class="nav-buttons-row">
+                    <button class="action-btn" onclick="goToStep(3)">הקודם</button>
+                    <button class="action-btn" id="next-btn-4" disabled onclick="startFMTest()">המשך למבחן צבעים</button>
+                </div>
+            </div>
+
+            <!-- שלב 5: מבחן ספקטרום -->
+            <div class="sub-screen" id="screen-5">
+                <div style="text-align: center; margin-top: 10px; width: 100%;">
+                    <h3 style="color: #f3f4f6; margin-bottom: 5px; font-size: 16px;">מבחן Farnsworth-Munsell</h3>
+                    <div class="fm-instructions">
+                        <b>סדרו את העיגולים מימין לשמאל</b> (מהאדום 1 אל הירוק 15).<br>
+                        לחצו על עיגול לבחירה, ואז על עיגול אחר להחלפה.
+                    </div>
+                </div>
+                <div class="center-content-box">
+                    <div class="direction-indicator">
+                        <span>כיוון הסידור ⟵</span>
+                    </div>
+                    <div id="circles-row"></div>
+                </div>
+                <div class="nav-buttons-row">
+                    <button class="action-btn" onclick="goToStep(4)">חזור לפריטים</button>
+                    <button class="action-btn" onclick="submitFinalTest()">הגש סריקה</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script id="stage3-logic">
+        const itemsData = [
+            { step: 1, correct: 87, options: [42, 87, 39, 95] },
+            { step: 2, correct: 346, options: [316, 346, 876, 276] },
+            { step: 3, correct: 81, options: [81, 31, 61, 91] },
+            { step: 4, correct: 45, options: [25, 65, 45, 85] }
+        ];
+
+        let userAnswers = {};
+
+        function initStage3() {
+            initOptions();
+            goToStep(0);
+            setTimeout(() => {
+                const overlay = document.getElementById("s3-room-overlay");
+                if (overlay) overlay.style.opacity = "0";
+            }, 400);
+        }
+
+        function goToStep(targetIndex) {
+            const screens = document.querySelectorAll('.sub-screen');
+            screens.forEach((screen, index) => {
+                screen.style.left = `${(index - targetIndex) * 100}%`;
+            });
+
+            document.querySelectorAll('.lvl-indicator').forEach(ind => ind.style.display = 'none');
+            if (targetIndex >= 1 && targetIndex <= 4) {
+                document.getElementById(`ind-${targetIndex}`).style.display = 'block';
+            }
+        }
+
+        function initOptions() {
+            itemsData.forEach(item => {
+                const container = document.getElementById(`opt-container-${item.step}`);
+                container.innerHTML = "";
+                let shuffled = [...item.options].sort(() => Math.random() - 0.5);
+                
+                shuffled.forEach(val => {
+                    const btn = document.createElement("button");
+                    btn.className = "opt-btn";
+                    btn.innerText = val;
+                    btn.onclick = () => selectAnswer(item.step, val, btn);
+                    container.appendChild(btn);
+                });
+            });
+        }
+
+        function selectAnswer(step, val, btnElement) {
+            userAnswers[step] = val;
+            const container = document.getElementById(`opt-container-${step}`);
+            const buttons = container.getElementsByClassName("opt-btn");
+            for (let b of buttons) { b.classList.remove("selected"); }
+            btnElement.classList.add("selected");
+            document.getElementById(`next-btn-${step}`).disabled = false;
+        }
+
+        const colorHexes = [
+            "AF3131", "A4362F", "993B2D", "8E402B", "83452A",
+            "784A28", "6D4F26", "635424", "585922", "4D5E20",
+            "42631E", "37681D", "2C6D1B", "217219", "167717"
+        ];
+
+        let fmCirclesData = [];
+        let selectedFMIndex = null;
+
+        function startFMTest() {
+            goToStep(5);
+            if (fmCirclesData.length === 0) {
+                buildFMCircles();
+            }
+        }
+
+        function buildFMCircles() {
+            fmCirclesData = [];
+            for (let i = 0; i < colorHexes.length; i++) {
+                fmCirclesData.push({
+                    originalIndex: i + 1,
+                    color: `#${colorHexes[i]}`
+                });
+            }
+
+            let shuffled = [...fmCirclesData].sort(() => Math.random() - 0.5);
+            fmCirclesData = shuffled;
+            renderFMCircles();
+        }
+
+        function renderFMCircles() {
+            const row = document.getElementById("circles-row");
+            row.innerHTML = "";
+
+            fmCirclesData.forEach((item, index) => {
+                const circle = document.createElement("div");
+                circle.className = "fm-circle";
+                circle.style.backgroundColor = item.color;
+                
+                if (selectedFMIndex === index) {
+                    circle.classList.add("selected-circle");
+                }
+
+                circle.onclick = () => {
+                    if (selectedFMIndex === null) {
+                        selectedFMIndex = index;
+                        renderFMCircles();
+                    } else {
+                        if (selectedFMIndex !== index) {
+                            let temp = fmCirclesData[selectedFMIndex];
+                            fmCirclesData[selectedFMIndex] = fmCirclesData[index];
+                            fmCirclesData[index] = temp;
+                        }
+                        selectedFMIndex = null;
+                        renderFMCircles();
+                    }
+                };
+
+                row.appendChild(circle);
+            });
+        }
+
+        function submitFinalTest() {
+            let correctItems = 0;
+            itemsData.forEach(item => {
+                if (userAnswers[item.step] === item.correct) correctItems++;
+            });
+            let itemsScore = (correctItems / 4) * 40;
+
+            let arr = fmCirclesData.map(item => item.originalIndex);
+            let lisLength = 0;
+            if (arr.length > 0) {
+                let dp = new Array(arr.length).fill(1);
+                for (let i = 0; i < arr.length; i++) {
+                    for (let j = 0; j < i; j++) {
+                        if (arr[i] > arr[j]) dp[i] = Math.max(dp[i], dp[j] + 1);
+                    }
+                    lisLength = Math.max(lisLength, dp[i]);
+                }
+            }
+
+            let fmScore = (lisLength / 15) * 60;
+            let finalScore = Math.round(itemsScore + fmScore);
+
+            window.stage3Result = {
+                correctItems,
+                itemsScore: Math.round(itemsScore),
+                fmScore: Math.round(fmScore),
+                total: finalScore,
+                answers: {...userAnswers},
+                fmOrder: arr.slice()
+            };
+            localStorage.setItem('stage3Score', String(finalScore));
+            localStorage.setItem('stage3ItemsScore', String(Math.round(itemsScore)));
+            localStorage.setItem('stage3FMScore', String(Math.round(fmScore)));
+            localStorage.setItem('stage3Answers', JSON.stringify(userAnswers));
+            localStorage.setItem('stage3FMOrder', JSON.stringify(arr));
+
+            finishStage3ToFinalResults();
+        }
+    
+</script>
+
+<script id="final-flow-logic">
+function savePlayerName(){
+  const input=document.getElementById('player-name'); const name=(input.value||'').trim();
+  if(!name){document.getElementById('name-error').textContent='נא להזין שם כדי להמשיך.';input.focus();return;}
+  localStorage.setItem('playerName',name);
+  document.getElementById('name-screen').style.display='none';
+}
+
+function showStage3Transition(){
+  // Hard reset: Stage 3 must not exist visually while the transition card is shown.
+  document.body.classList.remove('stage3-active','final-results-active');
+  document.body.classList.add('stage3-transition-active');
+
+  const game=document.getElementById('game-container');
+  const stage2=document.getElementById('stage2-screen');
+  const stage3=document.getElementById('stage3-screen');
+  const card=document.getElementById('s3-transition-card');
+  const tension=document.getElementById('score-tension');
+  const results=document.getElementById('final-results');
+
+  [game, stage2, stage3, tension, results].forEach(el=>{
+    if(!el) return;
+    el.style.display='none';
+    el.style.visibility='hidden';
+    el.style.opacity='0';
+    el.style.pointerEvents='none';
+  });
+
+  if(!card){
+    document.body.classList.remove('stage3-transition-active');
+    startStage3();
+    return;
+  }
+
+  // Make the transition itself the only visible canvas.
+  card.style.display='flex';
+  card.style.visibility='visible';
+  card.style.opacity='1';
+  card.style.pointerEvents='auto';
+  card.style.transition='none';
+  card.setAttribute('aria-hidden','false');
+
+  // The flow card remains for exactly 3 seconds.
+  setTimeout(()=>{
+    card.style.transition='opacity .35s ease';
+    card.style.opacity='0';
+
+    setTimeout(()=>{
+      card.style.display='none';
+      card.style.visibility='hidden';
+      card.style.pointerEvents='none';
+      card.setAttribute('aria-hidden','true');
+
+      document.body.classList.remove('stage3-transition-active');
+      startStage3();
+    },350);
+  },3000);
+}
+
+function startStage3(){
+  document.body.classList.remove('final-results-active','stage3-transition-active');
+  document.body.classList.add('stage3-active');
+  document.body.classList.add('stage1-complete');
+
+  const screen=document.getElementById('stage3-screen');
+  screen.classList.remove('stage3-hidden');
+  const game=document.getElementById('game-container');
+  const stage2=document.getElementById('stage2-screen');
+  const transition=document.getElementById('s3-transition-card');
+  if(!screen) return;
+
+  // Physically remove the previous application surfaces from the render tree.
+  [game, stage2, transition].forEach(el=>{
+    if(!el) return;
+    el.style.display='none';
+    el.style.visibility='hidden';
+    el.style.opacity='0';
+    el.style.pointerEvents='none';
+  });
+
+  // Stage 3 is the only active surface.
+  screen.style.display='block';
+  screen.style.visibility='visible';
+  screen.style.opacity='1';
+  screen.style.pointerEvents='auto';
+  screen.style.transform='translate(-50%,-50%)';
+  screen.style.position='fixed';
+  screen.style.zIndex='12000';
+
+  initStage3();
+}
+
+function finishStage3ToFinalResults(){
+  const s3=document.getElementById('stage3-screen');
+  if(s3){s3.style.transition='opacity .7s ease, transform .7s ease';s3.style.opacity='0';s3.style.transform='scale(.98)';}
+  setTimeout(()=>{
+    if(s3){s3.style.display='none';s3.style.opacity='';s3.style.transform='';}
+    document.body.classList.remove('stage3-active','stage3-transition-active');
+    document.body.classList.add('final-results-active');
+    const results=document.getElementById('final-results');
+    if(results){
+      results.style.display='none';
+      results.style.visibility='hidden';
+      results.style.opacity='0';
+      results.style.pointerEvents='none';
+    }
+    showScoreTension();
+  },750);
+}
+
+function showScoreTension(){
+  const overlay=document.getElementById('score-tension');
+  const content=document.getElementById('tension-content');
+  const results=document.getElementById('final-results');
+  if(!overlay || !content) return;
+
+  // Hard isolate the suspense sequence: the results card must not be visible yet.
+  if(results){
+    results.style.display='none';
+    results.style.visibility='hidden';
+    results.style.opacity='0';
+    results.style.pointerEvents='none';
+  }
+  overlay.style.display='flex';
+  overlay.style.visibility='visible';
+  overlay.style.opacity='1';
+  overlay.style.pointerEvents='auto';
+  overlay.style.zIndex='70000';
+
+  content.innerHTML='<div class="tension-ready">מוכנים לקבל ניקוד?</div>';
+
+  // Let the anticipation message breathe before the countdown starts.
+  setTimeout(()=>{
+    const nums=['3','2','1'];
+    let i=0;
+    const next=()=>{
+      if(i>=nums.length){
+        setTimeout(()=>{
+          overlay.style.display='none';
+          overlay.style.visibility='hidden';
+          overlay.style.opacity='0';
+          overlay.style.pointerEvents='none';
+          renderFinalResults();
+        },450);
+        return;
+      }
+      content.innerHTML='<div class="tension-number">'+nums[i]+'</div>';
+      i++;
+      setTimeout(next,800);
+    };
+    next();
+  },1700);
+}
+
+function renderFinalResults(){
+  const name=localStorage.getItem('playerName')||'חוקר';
+  const s1=Number(localStorage.getItem('stage1Score')||0), s2=Number(localStorage.getItem('stage2Score')||0), s3=Number(localStorage.getItem('stage3Score')||0);
+  const total=s1+s2+s3;
+  const results=document.getElementById('final-results');
+  const tension=document.getElementById('score-tension');
+  // The transition hard-resets these elements with inline hidden styles.
+  // Explicitly restore every visual property here so the results can never remain invisible.
+  if(tension){
+    tension.style.display='none';
+    tension.style.visibility='hidden';
+    tension.style.opacity='0';
+    tension.style.pointerEvents='none';
+  }
+  if(results){
+    results.style.display='block';
+    results.style.visibility='visible';
+    results.style.opacity='1';
+    results.style.pointerEvents='auto';
+    results.style.zIndex='60000';
+  }
+  document.body.classList.remove('stage3-active','stage3-transition-active');
+  document.body.classList.add('final-results-active');
+  document.getElementById('card-name').textContent=name;
+  document.getElementById('card-scores').innerHTML=`<div>סימולטור · ${s1} / 100</div><div>דני · ${s2} / 100</div><div>ספקטרום · ${s3} / 100</div>`;
+  document.getElementById('card-total').textContent=`${total} / 300`;
+  document.getElementById('detail-stage1-score').textContent=`${s1} / 100`;
+  document.getElementById('detail-stage2-score').textContent=`${s2} / 100`;
+  document.getElementById('detail-stage3-score').textContent=`${s3} / 100`;
+  renderStage1Details(); renderStage2Details(); renderStage3Details();
+}
+
+const plantAssets={
+  0:{name:'קקטוס',src:'cactusV.png'},
+  1:{name:'סוקולנט',src:'SucculentV.png'},
+  2:{name:'עלים',src:'leavesV.png'},
+  3:{name:'חמנייה',src:'sunflowerV.png'},
+  4:{name:'סחלב',src:'orchidV.png'}
+};
+
+function plantOrderHTML(order){
+  return (Array.isArray(order)?order:[]).map((id,i)=>{
+    const p=plantAssets[id]||{name:String(id),src:''};
+    return `<div class="plant-result-item"><img src="${p.src}" alt="${p.name}"><span>${i+1}. ${p.name}</span></div>`;
+  }).join('');
+}
+
+function renderStage1Details(){
+ const user=JSON.parse(localStorage.getItem('stage1UserOrder')||'[]');
+ const correct=JSON.parse(localStorage.getItem('stage1CorrectOrder')||'[]');
+ document.getElementById('stage1-order-detail').innerHTML=`
+   <div class="plant-order-block">
+     <div class="plant-order-title">הסדר שלך</div>
+     <div class="plant-order-row">${plantOrderHTML(user)}</div>
+   </div>
+   <div class="plant-order-block">
+     <div class="plant-order-title">הסדר הנכון</div>
+     <div class="plant-order-row">${plantOrderHTML(correct)}</div>
+   </div>`;
+}
+
+function renderStage2Details(){
+ const user=JSON.parse(localStorage.getItem('stage2UserChoices')||'[]');
+ const correct=[
+  "סגול מעלה תחושה של מסתורין, מלכותיות ורוגע עמוק",
+  "סגול הוא כמו שילוב בין תחושה של חום לבין קור",
+  "סגול הוא כמו צבע אדום שכיבו לו את האש"
+ ];
+ const why={
+  "סגול מעלה תחושה של מסתורין, מלכותיות ורוגע עמוק":
+    "הסבר: זה מתאר חוויה מוכרת פיזית.",
+  "סגול הוא כמו שילוב בין תחושה של חום לבין קור":
+    "הסבר: זה תיאור של תחושה פיזית, ולכן הוא יכול להעביר חוויה בלי להניח שהצופה רואה את אותו צבע.",
+  "סגול הוא כמו צבע אדום שכיבו לו את האש":
+    "הסבר: זו אנלוגיה לחוויה חזותית שלא מכריח מידע של צבע."
+ };
+ const selected=user.slice(0,3);
+ document.getElementById('stage2-detail').innerHTML=selected.map(x=>{
+   const ok=correct.includes(x);
+   const reason=why[x] || "הסבר: ההסבר נשען על השוואה או אסוציאציה שאינה מאפשרת לתאר את החוויה החזותית עצמה ללא קולטן כחול.";
+   return `<div class="result-choice-line">
+      <span class="choice-text ${ok?'good':'bad'}">${ok?'✓':'✕'} ${x}</span>
+      <span class="choice-why">${reason}</span>
+   </div>`;
+ }).join('') || '<div class="result-line">לא נבחרו הסברים.</div>';
+}
+
+function renderStage3Details(){
+ const answers=JSON.parse(localStorage.getItem('stage3Answers')||'{}');
+ const fm=JSON.parse(localStorage.getItem('stage3FMOrder')||'[]');
+ const correctAnswers={1:87,2:346,3:81,4:45};
+ const colorHexes=[
+  "#AF3131","#A4362F","#993B2D","#8E402B","#83452A",
+  "#784A28","#6D4F26","#635424","#585922","#4D5E20",
+  "#42631E","#37681D","#2C6D1B","#217219","#167717"
+ ];
+ const makeDots=(order)=> (Array.isArray(order)?order:[]).map(n=>{
+   const c=colorHexes[(Number(n)||1)-1]||'#64748b';
+   return `<span class="color-result-dot" style="background:${c}" title="${n}"></span>`;
+ }).join('');
+ let html='';
+ [1,2,3,4].forEach(i=>{
+   const u=answers[i];
+   const ok=Number(u)===correctAnswers[i];
+   html+=`<div class="result-choice-line">
+     <span class="choice-text ${ok?'good':'bad'}">${ok?'✓':'✕'} פריט ${i}: ${u??'לא נבחר'}</span>
+     <span class="choice-why">התשובה הנכונה: ${correctAnswers[i]}</span>
+   </div>`;
+ });
+ html+=`
+   <div class="plant-order-block">
+     <div class="plant-order-title">סידור הצבעים שלך</div>
+     <div class="color-order-row">${makeDots(fm)}</div>
+   </div>
+   <div class="plant-order-block">
+     <div class="plant-order-title">הסידור הנכון</div>
+     <div class="color-order-row">${makeDots(Array.from({length:15},(_,i)=>i+1))}</div>
+   </div>`;
+ document.getElementById('stage3-detail').innerHTML=html;
+}
+
+async function saveFinalCard(){
+ const img=document.getElementById('final-card-image');
+ const canvas=document.createElement('canvas'); const w=img.naturalWidth||1600,h=img.naturalHeight||1000; canvas.width=w;canvas.height=h;const ctx=canvas.getContext('2d');
+ const draw=()=>{ctx.drawImage(img,0,0,w,h);const name=localStorage.getItem('playerName')||'חוקר';const s1=Number(localStorage.getItem('stage1Score')||0),s2=Number(localStorage.getItem('stage2Score')||0),s3=Number(localStorage.getItem('stage3Score')||0);ctx.direction='rtl';ctx.textAlign='center';ctx.fillStyle='#fff';ctx.font=`900 ${Math.round(w*.045)}px Arial`;ctx.fillText(name,w*.5,h*.22);ctx.textAlign='right';ctx.font=`700 ${Math.round(w*.022)}px Arial`;ctx.fillText(`שלב 1 · ${s1}/100`,w*.88,h*.40);ctx.fillText(`דני · ${s2}/100`,w*.88,h*.46);ctx.fillText(`שלב 3 · ${s3}/100`,w*.88,h*.52);ctx.font=`900 ${Math.round(w*.05)}px Arial`;ctx.fillText(`${s1+s2+s3} / 300`,w*.88,h*.78);canvas.toBlob(async blob=>{if(!blob)return;const file=new File([blob],'Quantum-Station-score.png',{type:'image/png'});if(navigator.share && navigator.canShare && navigator.canShare({files:[file]})){try{await navigator.share({files:[file],title:'Quantum Station',text:'שתפו אותנו בתחנת קוונטום'});return}catch(e){}}const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='Quantum-Station-score.png';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);},'image/png');};
+ if(img.complete && img.naturalWidth) draw(); else img.onload=draw;
+}
+</script>
+</body>
