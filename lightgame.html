@@ -2,6 +2,7 @@
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
     <title>Quantum Station - מעבדת מחקר</title>
     <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@700&display=swap" rel="stylesheet">
     <style>
@@ -330,7 +331,19 @@
         .plant-slot {
             width: 70px; height: 170px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; position: relative; cursor: grab; touch-action: none;
         }
-        .plant-slot:active { cursor: grabbing; }
+        .plant-slot:active { cursor: pointer; }
+        .plant-slot { cursor: pointer; }
+        .plant-slot.plant-selected .plant-container {
+            transform:translateY(-5px) scale(1.06);
+            filter:drop-shadow(0 0 12px rgba(56,189,248,.7));
+        }
+        .plant-slot.plant-selected::after {
+            content:'1'; position:absolute; top:0; right:50%; transform:translateX(50%);
+            width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+            background:#0f172a; color:#67e8f9; border:1px solid rgba(56,189,248,.75);
+            font-size:10px; font-weight:900; z-index:30; box-shadow:0 0 14px rgba(56,189,248,.35);
+        }
+
 
         .plant-container { position: relative; width: 75px; height: 75px; margin-bottom: 8px; }
         .plant-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; }
@@ -506,9 +519,41 @@
             box-shadow:0 0 18px rgba(34,211,238,.12); z-index:5;
         }
         .lesson-drag-label { position:absolute; bottom:10px; font-size:8px; color:#94a3b8; z-index:6; }
-        .lesson-drag-demo.play .lesson-drag-plant.left-plant { animation:lessonPlantSwapLeft 2.8s cubic-bezier(.22,.8,.25,1) .25s infinite; }
-        .lesson-drag-demo.play .lesson-drag-plant.right-plant { animation:lessonPlantSwapRight 2.8s cubic-bezier(.22,.8,.25,1) .25s infinite; }
-        .lesson-drag-demo.play .lesson-drag-arrow { animation:lessonDragArrow 2.8s ease .25s infinite; }
+                .lesson-drag-demo.play .lesson-drag-arrow { animation:lessonDragArrow 2.8s ease .25s infinite; }
+        .lesson-click-badge {
+            position:absolute; top:7px; width:22px; height:22px; border-radius:50%;
+            display:flex; align-items:center; justify-content:center; z-index:8;
+            background:rgba(15,23,42,.96); border:1px solid rgba(56,189,248,.65);
+            color:#67e8f9; font-size:10px; font-weight:900;
+            box-shadow:0 0 0 0 rgba(56,189,248,.0);
+        }
+        .left-badge{left:8px}.right-badge{right:8px}
+        .lesson-drag-demo.play .left-badge { animation:lessonClickOne 2.8s ease .25s infinite; }
+        .lesson-drag-demo.play .right-badge { animation:lessonClickTwo 2.8s ease .25s infinite; }
+        .lesson-drag-demo.play .lesson-drag-plant.left-plant { animation:lessonPlantClickSwapLeft 2.8s cubic-bezier(.22,.8,.25,1) .25s infinite; }
+        .lesson-drag-demo.play .lesson-drag-plant.right-plant { animation:lessonPlantClickSwapRight 2.8s cubic-bezier(.22,.8,.25,1) .25s infinite; }
+
+        @keyframes lessonClickOne {
+            0%,8%{transform:scale(.82);opacity:.55;box-shadow:0 0 0 0 rgba(56,189,248,0)}
+            14%,28%{transform:scale(1.12);opacity:1;box-shadow:0 0 0 8px rgba(56,189,248,.12)}
+            34%,100%{transform:scale(.82);opacity:.55;box-shadow:0 0 0 0 rgba(56,189,248,0)}
+        }
+        @keyframes lessonClickTwo {
+            0%,34%{transform:scale(.82);opacity:.55;box-shadow:0 0 0 0 rgba(56,189,248,0)}
+            40%,54%{transform:scale(1.12);opacity:1;box-shadow:0 0 0 8px rgba(56,189,248,.12)}
+            60%,100%{transform:scale(.82);opacity:.55;box-shadow:0 0 0 0 rgba(56,189,248,0)}
+        }
+        @keyframes lessonPlantClickSwapLeft {
+            0%,34%{transform:translateX(0) rotate(0) scale(1)}
+            40%{transform:translateX(0) rotate(-2deg) scale(1.06)}
+            52%{transform:translateX(154px) rotate(3deg) scale(.96)}
+            70%,100%{transform:translateX(154px) rotate(0) scale(1)}
+        }
+        @keyframes lessonPlantClickSwapRight {
+            0%,54%{transform:translateX(0) rotate(0) scale(1)}
+            62%{transform:translateX(-154px) rotate(-3deg) scale(.96)}
+            78%,100%{transform:translateX(-154px) rotate(0) scale(1)}
+        }
         @keyframes lessonPlantSwapLeft {
             0%,14%{transform:translateX(0) rotate(0) scale(1);opacity:1}
             28%{transform:translateX(42px) translateY(-18px) rotate(-5deg) scale(1.06);opacity:1}
@@ -640,29 +685,6 @@
         .s2-choice:hover:not(:disabled) { background: #38bdf8; color: #0f172a; }
         .s2-choice:disabled { opacity: 0.4; cursor: not-allowed; border-color: #64748b; color: #64748b; }
     </style>
-
-<style id="mobile-single-plant-drag-fix">
-@media (pointer: coarse){
-  #slots-row{touch-action:none;}
-  #slots-row.is-plant-dragging .plant-slot:not(.plant-drag-source){
-    pointer-events:none !important;
-  }
-  .plant-slot.plant-drag-source{
-    opacity:.35 !important;
-  }
-  .plant-drag-ghost{
-    position:fixed !important;
-    z-index:99999 !important;
-    width:82px !important;
-    height:92px !important;
-    margin:0 !important;
-    pointer-events:none !important;
-    transform:translate(-50%,-58%) !important;
-    opacity:1 !important;
-    filter:drop-shadow(0 12px 16px rgba(0,0,0,.45));
-  }
-}
-</style>
 
 <style id="final-flow-styles">
 #name-screen{
@@ -1107,6 +1129,187 @@ body.stage3-transition-active #s3-transition-card .s2-transition-box{
 <style>
 #stage3-screen{width:min(100vw,177.7778vh);height:min(100vh,56.25vw);max-width:100vw;max-height:100vh;}
 </style>
+
+<style id="mobile-optimization">
+html, body {
+    width:100%;
+    min-width:100%;
+    margin:0;
+    padding:0;
+    overscroll-behavior:none;
+}
+
+.plant-drag-ghost {
+    position:fixed !important;
+    z-index:99999 !important;
+    pointer-events:none !important;
+    margin:0 !important;
+    transform:scale(1.08) rotate(-2deg);
+    filter:drop-shadow(0 12px 16px rgba(0,0,0,.45));
+    transition:transform .08s linear;
+}
+.plant-slot.drag-source { opacity:.78; }
+.plant-slot.drag-over {
+    transform:translateY(-5px) scale(1.04);
+    filter:drop-shadow(0 0 10px rgba(56,189,248,.45));
+}
+
+@media (max-width:700px), (pointer:coarse) {
+    body {
+        height:100dvh;
+        min-height:100dvh;
+        overflow:hidden;
+    }
+    #game-container {
+        width:100vw !important;
+        height:100dvh !important;
+        min-width:0 !important;
+        min-height:0 !important;
+        max-width:none !important;
+        max-height:none !important;
+        border:0 !important;
+        box-shadow:none !important;
+        border-radius:0 !important;
+    }
+    #water-cup {
+        width:64px; height:76px;
+        top:clamp(68px,10dvh,110px);
+        right:18px;
+    }
+    #tools-bar {
+        top:clamp(68px,10dvh,110px);
+        padding:0 18px;
+    }
+    .glasses-btn { width:82px; height:49px; }
+    #slots-row {
+        bottom:clamp(78px,10dvh,105px);
+        padding:0 8px;
+        gap:2px;
+    }
+    .plant-slot {
+        flex:1 1 0;
+        width:auto;
+        max-width:78px;
+        height:clamp(145px,20dvh,175px);
+    }
+    .plant-container { width:clamp(66px,18vw,78px); height:clamp(66px,18vw,78px); }
+    .water-meter-container { width:clamp(62px,17vw,72px); background-size:100% 100%; }
+    .water-meter-fill { transition-duration:.08s; }
+
+    #stage2-screen {
+        width:100vw !important;
+        height:100dvh !important;
+        max-width:none !important;
+        max-height:none !important;
+        aspect-ratio:auto !important;
+        border:0 !important;
+    }
+    #stage3-screen {
+        width:100vw !important;
+        height:100dvh !important;
+        max-width:none !important;
+        max-height:none !important;
+        aspect-ratio:auto !important;
+        border:0 !important;
+    }
+
+    #s3-header { height:58px; }
+    #screens-wrapper { top:58px; height:calc(100% - 58px); }
+    .sub-screen { padding:12px 16px 16px; }
+    .title-box { margin-top:14px; }
+    .title-box h1 { font-size:21px; margin-bottom:8px; }
+    .title-box p { font-size:13px; margin-bottom:12px; }
+    .center-content-box { margin-top:4px; }
+    .item-viewport {
+        width:min(68vw,270px);
+        height:min(30vh,220px);
+        margin-top:8px;
+    }
+    .item-viewport img { max-width:100%; max-height:100%; }
+    .item-header-title { font-size:13px; }
+    .options-grid {
+        gap:9px;
+        margin-top:9px;
+    }
+    .opt-btn {
+        min-height:52px;
+        padding:10px 8px;
+        font-size:15px;
+        line-height:1.2;
+        touch-action:manipulation;
+    }
+    .nav-buttons-row { margin-bottom:14px; gap:10px; }
+    .action-btn {
+        min-height:50px;
+        font-size:14px;
+        padding:10px 12px;
+        touch-action:manipulation;
+    }
+
+    /* Farnsworth circles: fixed, large touch targets instead of tiny 20px dots. */
+    #screen-5 .center-content-box { width:100%; }
+    #screen-5 .fm-instructions { font-size:13px; line-height:1.5; padding:0 8px; }
+    #circles-row {
+        width:min(94vw,390px);
+        max-width:none;
+        display:grid;
+        grid-template-columns:repeat(5, 1fr);
+        grid-template-rows:repeat(3, 1fr);
+        gap:11px;
+        padding:14px 12px;
+        margin:8px auto 10px;
+        box-sizing:border-box;
+    }
+    .fm-circle {
+        width:clamp(40px,12vw,52px);
+        height:clamp(40px,12vw,52px);
+        justify-self:center;
+        border-width:3px;
+        touch-action:manipulation;
+    }
+    .fm-circle.selected-circle { transform:scale(1.08); }
+
+    #stage3-screen .nav-buttons-row {
+        flex-shrink:0;
+    }
+
+    /* Dialogue: give the text more width and make every choice an easy thumb target. */
+    .s2-dialogue { padding:0 10px 12px !important; }
+    .s2-dialogue-box {
+        width:min(94vw,760px) !important;
+        padding:11px 14px 12px !important;
+        border-radius:16px !important;
+    }
+    .s2-text { font-size:15px !important; line-height:1.5 !important; min-height:24px !important; }
+    .s2-choices { gap:7px !important; }
+    .s2-choice {
+        min-height:46px;
+        padding:9px 8px !important;
+        font-size:13px !important;
+        touch-action:manipulation;
+    }
+
+    #s3-transition-card { width:100vw !important; height:100dvh !important; }
+    #score-tension, #final-results {
+        width:100vw !important;
+        height:100dvh !important;
+        max-width:none !important;
+        max-height:none !important;
+        aspect-ratio:auto !important;
+    }
+}
+</style>
+
+
+<style>
+.ir-transition-layer{
+  transition:opacity .22s ease;
+  will-change:opacity;
+}
+@media (max-width:600px){
+  .drag-ghost{pointer-events:none!important;touch-action:none!important;will-change:transform;transform-origin:center center;}
+}
+</style>
 </head>
 <body>
 
@@ -1177,15 +1380,17 @@ body.stage3-transition-active #s3-transition-card .s2-transition-box{
                 <div id="lesson-meter" class="lesson-meter">
                     <div class="lesson-meter-fill"></div>
                 </div>
-                <div id="lesson-drag-demo" class="lesson-drag-demo play" aria-label="הדגמת גרירת צמחים">
+                <div id="lesson-drag-demo" class="lesson-drag-demo play" aria-label="הדגמת החלפת צמחים בלחיצה">
                     <div class="lesson-drag-slot left">
+                        <span class="lesson-click-badge left-badge">1</span>
                         <img class="lesson-drag-plant left-plant" src="leavesV.png" alt="leavesV">
                     </div>
                     <div class="lesson-drag-slot right">
+                        <span class="lesson-click-badge right-badge">2</span>
                         <img class="lesson-drag-plant right-plant" src="cactusV.png" alt="cactusV">
                     </div>
                     <div class="lesson-drag-arrow">↔</div>
-                    <div class="lesson-drag-label">כך מסדרים את הצמחים לפי המיקום הנכון</div>
+                    <div class="lesson-drag-label">לוחצים על צמח אחד ואז על צמח אחר — והם מתחלפים</div>
                 </div>
             </div>
             <div id="lesson-title"></div>
@@ -1468,7 +1673,7 @@ body.stage3-transition-active #s3-transition-card .s2-transition-box{
         },
         {
             title:'מסדרים את הצמחים',
-            text:'אחרי שהבנתם את מצב הצמח, מסדרים את הצמחים במקום הנכון באמצעות גרירה.',
+            text:'אחרי שהבנתם את מצב הצמח, לוחצים על צמח אחד ואז על צמח אחר כדי להחליף ביניהם ולסדר אותם במקום הנכון.',
             plant:'v', meter:'normal', fill:88, animation:'drag'
         }
     ];
@@ -1632,6 +1837,8 @@ body.stage3-transition-active #s3-transition-card .s2-transition-box{
         return "filter: none;";
     }
 
+    window.selectedPlantIndex = null;
+
     function renderBoard() {
         const row = document.getElementById('slots-row');
         row.innerHTML = '';
@@ -1641,6 +1848,34 @@ body.stage3-transition-active #s3-transition-card .s2-transition-box{
             if (targetWateringIndex === idx) slot.classList.add('watering-active');
 
             slot.draggable = false;
+
+            // Desktop + mobile: select one plant, then another plant to swap them.
+            // No simultaneous drag/pointer state exists, so two plants cannot be held at once.
+            slot.addEventListener('click', (e) => {
+                if (e.target.closest('.water-meter-container')) return;
+                const slots = Array.from(document.querySelectorAll('.plant-slot'));
+                const idxNow = slots.indexOf(slot);
+                if (idxNow < 0) return;
+
+                if (window.selectedPlantIndex === null || window.selectedPlantIndex === undefined) {
+                    window.selectedPlantIndex = idxNow;
+                    slot.classList.add('plant-selected');
+                    return;
+                }
+
+                const first = window.selectedPlantIndex;
+                if (first === idxNow) {
+                    slot.classList.remove('plant-selected');
+                    window.selectedPlantIndex = null;
+                    return;
+                }
+
+                const temp = plants[first];
+                plants[first] = plants[idxNow];
+                plants[idxNow] = temp;
+                window.selectedPlantIndex = null;
+                renderBoard();
+            });
 
             let visualStyle = getPlantVisualStyle(p);
             let innerMarkup = '';
@@ -1771,6 +2006,7 @@ body.stage3-transition-active #s3-transition-card .s2-transition-box{
     }
 
     function toggleIR() {
+    if (window.preloadQuantumVisuals) window.preloadQuantumVisuals();
         isIRActive = !isIRActive;
         const container = document.getElementById('game-container');
         const glassesBtn = document.getElementById('glasses-toggle');
@@ -1864,33 +2100,36 @@ body.stage3-transition-active #s3-transition-card .s2-transition-box{
         exprSmile.setAttribute("opacity", type === 'smile' ? "1" : "0");
     }
 
-    let typeWriterFrame = 0;
     function typeWriter(text, callback) {
-        cancelAnimationFrame(typeWriterFrame);
+        // Mobile browsers can make hundreds of tiny timers + innerHTML writes feel sluggish.
+        // Use elapsed time + textContent so the typing speed stays visually consistent.
+        if (window.__typeWriterCancel) window.__typeWriterCancel();
         textElement.textContent = "";
-        let charIndex = 0;
-        let lastTime = 0;
-        const interval = 21;
-
-        function type(now) {
-            if (!lastTime) lastTime = now;
-            if (now - lastTime >= interval) {
-                // Render a small batch when the browser is busy so mobile never
-                // accumulates a queue of delayed timers.
-                const chars = now - lastTime > 70 ? 2 : 1;
-                charIndex = Math.min(text.length, charIndex + chars);
-                textElement.textContent = text.slice(0, charIndex);
-                lastTime = now;
-            }
-
-            if (charIndex < text.length) {
-                typeWriterFrame = requestAnimationFrame(type);
-            } else {
-                typeWriterFrame = 0;
-                if (callback) callback();
-            }
-        }
-        typeWriterFrame = requestAnimationFrame(type);
+        const mobile = window.matchMedia('(max-width: 700px)').matches;
+        const speed = mobile ? 11 : 30;
+        const started = performance.now();
+        let rafId = null;
+        let finished = false;
+        const finish = () => {
+            if (finished) return;
+            finished = true;
+            if (rafId) cancelAnimationFrame(rafId);
+            textElement.textContent = text;
+            window.__typeWriterCancel = null;
+            if (callback) callback();
+        };
+        window.__typeWriterCancel = () => {
+            finished = true;
+            if (rafId) cancelAnimationFrame(rafId);
+        };
+        const tick = (now) => {
+            if (finished) return;
+            const count = Math.min(text.length, Math.floor((now - started) / speed));
+            textElement.textContent = text.slice(0, count);
+            if (count >= text.length) finish();
+            else rafId = requestAnimationFrame(tick);
+        };
+        rafId = requestAnimationFrame(tick);
     }
 
     function setChoices(choicesArray) {
@@ -2875,104 +3114,29 @@ async function saveFinalCard(){
 }
 </script>
 
-<script id="single-plant-pointer-drag">
+<script>
 (function(){
-  const row = document.getElementById('slots-row');
-  if (!row) return;
-
-  let active = null;
-
-  function clearDrag(){
-    if (!active) return;
-    if (active.source) active.source.classList.remove('plant-drag-source');
-    if (active.ghost && active.ghost.parentNode) active.ghost.remove();
-    row.classList.remove('is-plant-dragging');
-    active = null;
+  const IR_ASSETS = [
+    'leavesIRN.png','leavesIRT.png','leavesIRH.png',
+    'watermeterIR.png','watermeterfull.png','watermeterempty.png',
+    'leavesV.png','cactusV.png','orchidV.png','succulentV.png','sunflowerV.png'
+  ];
+  const irCache = new Map();
+  function preloadImage(src){
+    if(irCache.has(src)) return irCache.get(src);
+    const img = new Image();
+    const promise = new Promise(resolve=>{
+      img.onload = async ()=>{ try { if(img.decode) await img.decode(); } catch(_){} resolve(img); };
+      img.onerror = ()=>resolve(img);
+    });
+    img.src = src;
+    irCache.set(src,promise);
+    return promise;
   }
-
-  function moveGhost(e){
-    if (!active || e.pointerId !== active.pointerId) return;
-    active.ghost.style.left = e.clientX + 'px';
-    active.ghost.style.top = e.clientY + 'px';
-  }
-
-  row.addEventListener('pointerdown', function(e){
-    if (active) {
-      e.preventDefault();
-      e.stopPropagation();
-      return;
-    }
-    const source = e.target.closest('.plant-slot');
-    if (!source || !row.contains(source)) return;
-    if (e.pointerType === 'mouse' && e.button !== 0) return;
-
-    e.preventDefault();
-    e.stopPropagation();
-
-    const slots = Array.from(row.querySelectorAll('.plant-slot'));
-    const fromIdx = slots.indexOf(source);
-    if (fromIdx < 0) return;
-
-    // One pointer only. While this is active every other plant is inert.
-    active = {pointerId:e.pointerId, source, fromIdx, ghost:null};
-    row.classList.add('is-plant-dragging');
-    source.classList.add('plant-drag-source');
-
-    const plant = source.querySelector('.plant-container');
-    if (plant) {
-      const ghost = plant.cloneNode(true);
-      ghost.classList.add('plant-drag-ghost');
-      ghost.querySelectorAll('*').forEach(el => el.style.pointerEvents='none');
-      document.body.appendChild(ghost);
-      active.ghost = ghost;
-      moveGhost(e);
-    }
-
-    if (source.setPointerCapture) {
-      try { source.setPointerCapture(e.pointerId); } catch(_) {}
-    }
-  }, {passive:false});
-
-  row.addEventListener('pointermove', function(e){
-    if (!active || e.pointerId !== active.pointerId) return;
-    e.preventDefault();
-    moveGhost(e);
-  }, {passive:false});
-
-  row.addEventListener('pointerup', function(e){
-    if (!active || e.pointerId !== active.pointerId) return;
-    e.preventDefault();
-
-    // Temporarily hide the ghost so elementFromPoint sees the actual slot.
-    if (active.ghost) active.ghost.style.display='none';
-    const hit = document.elementFromPoint(e.clientX, e.clientY);
-    if (active.ghost) active.ghost.style.display='';
-
-    const target = hit && hit.closest ? hit.closest('.plant-slot') : null;
-    const slots = Array.from(row.querySelectorAll('.plant-slot'));
-    const toIdx = target && row.contains(target) ? slots.indexOf(target) : -1;
-
-    if (toIdx >= 0 && toIdx !== active.fromIdx && Array.isArray(window.plants)) {
-      const tmp = plants[active.fromIdx];
-      plants[active.fromIdx] = plants[toIdx];
-      plants[toIdx] = tmp;
-      if (typeof renderBoard === 'function') renderBoard();
-    }
-
-    clearDrag();
-  }, {passive:false});
-
-  row.addEventListener('pointercancel', function(e){
-    if (active && e.pointerId === active.pointerId) clearDrag();
-  }, {passive:false});
-
-  // Extra guard against multi-touch starting another drag anywhere in the board.
-  row.addEventListener('touchstart', function(e){
-    if (active && e.touches.length > 0) {
-      e.preventDefault();
-    }
-  }, {passive:false});
+  window.preloadQuantumVisuals = function(){
+    return Promise.all(IR_ASSETS.map(preloadImage));
+  };
+  window.preloadQuantumVisuals();
 })();
 </script>
-
 </body>
