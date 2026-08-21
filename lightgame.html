@@ -331,10 +331,22 @@
         .plant-slot {
             width: 70px; height: 170px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; position: relative; cursor: grab; touch-action: none;
         }
-        .plant-slot:active { cursor: grabbing; }
+        .plant-slot:active { cursor: pointer; }
+        .plant-slot { cursor: pointer; }
+        .plant-slot.plant-selected .plant-container {
+            transform:translateY(-5px) scale(1.06);
+            filter:drop-shadow(0 0 12px rgba(56,189,248,.7));
+        }
+        .plant-slot.plant-selected::after {
+            content:'1'; position:absolute; top:0; right:50%; transform:translateX(50%);
+            width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+            background:#0f172a; color:#67e8f9; border:1px solid rgba(56,189,248,.75);
+            font-size:10px; font-weight:900; z-index:30; box-shadow:0 0 14px rgba(56,189,248,.35);
+        }
+
 
         .plant-container { position: relative; width: 75px; height: 75px; margin-bottom: 8px; }
-        .plant-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; transition: opacity 0.18s ease; will-change: opacity; }
+        .plant-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; }
 
         .water-meter-container {
             position: relative; width: 70px; height: 20px; margin-top: 5px;
@@ -507,9 +519,41 @@
             box-shadow:0 0 18px rgba(34,211,238,.12); z-index:5;
         }
         .lesson-drag-label { position:absolute; bottom:10px; font-size:8px; color:#94a3b8; z-index:6; }
-        .lesson-drag-demo.play .lesson-drag-plant.left-plant { animation:lessonPlantSwapLeft 2.8s cubic-bezier(.22,.8,.25,1) .25s infinite; }
-        .lesson-drag-demo.play .lesson-drag-plant.right-plant { animation:lessonPlantSwapRight 2.8s cubic-bezier(.22,.8,.25,1) .25s infinite; }
-        .lesson-drag-demo.play .lesson-drag-arrow { animation:lessonDragArrow 2.8s ease .25s infinite; }
+                .lesson-drag-demo.play .lesson-drag-arrow { animation:lessonDragArrow 2.8s ease .25s infinite; }
+        .lesson-click-badge {
+            position:absolute; top:7px; width:22px; height:22px; border-radius:50%;
+            display:flex; align-items:center; justify-content:center; z-index:8;
+            background:rgba(15,23,42,.96); border:1px solid rgba(56,189,248,.65);
+            color:#67e8f9; font-size:10px; font-weight:900;
+            box-shadow:0 0 0 0 rgba(56,189,248,.0);
+        }
+        .left-badge{left:8px}.right-badge{right:8px}
+        .lesson-drag-demo.play .left-badge { animation:lessonClickOne 2.8s ease .25s infinite; }
+        .lesson-drag-demo.play .right-badge { animation:lessonClickTwo 2.8s ease .25s infinite; }
+        .lesson-drag-demo.play .lesson-drag-plant.left-plant { animation:lessonPlantClickSwapLeft 2.8s cubic-bezier(.22,.8,.25,1) .25s infinite; }
+        .lesson-drag-demo.play .lesson-drag-plant.right-plant { animation:lessonPlantClickSwapRight 2.8s cubic-bezier(.22,.8,.25,1) .25s infinite; }
+
+        @keyframes lessonClickOne {
+            0%,8%{transform:scale(.82);opacity:.55;box-shadow:0 0 0 0 rgba(56,189,248,0)}
+            14%,28%{transform:scale(1.12);opacity:1;box-shadow:0 0 0 8px rgba(56,189,248,.12)}
+            34%,100%{transform:scale(.82);opacity:.55;box-shadow:0 0 0 0 rgba(56,189,248,0)}
+        }
+        @keyframes lessonClickTwo {
+            0%,34%{transform:scale(.82);opacity:.55;box-shadow:0 0 0 0 rgba(56,189,248,0)}
+            40%,54%{transform:scale(1.12);opacity:1;box-shadow:0 0 0 8px rgba(56,189,248,.12)}
+            60%,100%{transform:scale(.82);opacity:.55;box-shadow:0 0 0 0 rgba(56,189,248,0)}
+        }
+        @keyframes lessonPlantClickSwapLeft {
+            0%,34%{transform:translateX(0) rotate(0) scale(1)}
+            40%{transform:translateX(0) rotate(-2deg) scale(1.06)}
+            52%{transform:translateX(154px) rotate(3deg) scale(.96)}
+            70%,100%{transform:translateX(154px) rotate(0) scale(1)}
+        }
+        @keyframes lessonPlantClickSwapRight {
+            0%,54%{transform:translateX(0) rotate(0) scale(1)}
+            62%{transform:translateX(-154px) rotate(-3deg) scale(.96)}
+            78%,100%{transform:translateX(-154px) rotate(0) scale(1)}
+        }
         @keyframes lessonPlantSwapLeft {
             0%,14%{transform:translateX(0) rotate(0) scale(1);opacity:1}
             28%{transform:translateX(42px) translateY(-18px) rotate(-5deg) scale(1.06);opacity:1}
@@ -1229,6 +1273,31 @@ html, body {
         flex-shrink:0;
     }
 
+    /* Stage 2 mobile: keep the dialogue readable and stable without forcing
+       the browser to continuously resize/reflow the scene while typing. */
+    #stage2-screen {
+        width:100vw !important;
+        height:100dvh !important;
+        max-width:none !important;
+        max-height:none !important;
+        overflow:hidden !important;
+        touch-action:manipulation;
+    }
+    #s2-danny-scene {
+        bottom:205px;
+        width:min(180px,42vw);
+        height:auto;
+        aspect-ratio:180 / 220;
+    }
+    #s2-dialogue {
+        transform:translateZ(0);
+        will-change:opacity;
+    }
+    #s2-text-container, #s2-text {
+        transform:translateZ(0);
+        backface-visibility:hidden;
+    }
+
     /* Dialogue: give the text more width and make every choice an easy thumb target. */
     .s2-dialogue { padding:0 10px 12px !important; }
     .s2-dialogue-box {
@@ -1256,6 +1325,16 @@ html, body {
 }
 </style>
 
+
+<style>
+.ir-transition-layer{
+  transition:opacity .22s ease;
+  will-change:opacity;
+}
+@media (max-width:600px){
+  .drag-ghost{pointer-events:none!important;touch-action:none!important;will-change:transform;transform-origin:center center;}
+}
+</style>
 </head>
 <body>
 
@@ -1326,15 +1405,17 @@ html, body {
                 <div id="lesson-meter" class="lesson-meter">
                     <div class="lesson-meter-fill"></div>
                 </div>
-                <div id="lesson-drag-demo" class="lesson-drag-demo play" aria-label="הדגמת גרירת צמחים">
+                <div id="lesson-drag-demo" class="lesson-drag-demo play" aria-label="הדגמת החלפת צמחים בלחיצה">
                     <div class="lesson-drag-slot left">
+                        <span class="lesson-click-badge left-badge">1</span>
                         <img class="lesson-drag-plant left-plant" src="leavesV.png" alt="leavesV">
                     </div>
                     <div class="lesson-drag-slot right">
+                        <span class="lesson-click-badge right-badge">2</span>
                         <img class="lesson-drag-plant right-plant" src="cactusV.png" alt="cactusV">
                     </div>
                     <div class="lesson-drag-arrow">↔</div>
-                    <div class="lesson-drag-label">כך מסדרים את הצמחים לפי המיקום הנכון</div>
+                    <div class="lesson-drag-label">לוחצים על צמח אחד ואז על צמח אחר — והם מתחלפים</div>
                 </div>
             </div>
             <div id="lesson-title"></div>
@@ -1617,7 +1698,7 @@ html, body {
         },
         {
             title:'מסדרים את הצמחים',
-            text:'אחרי שהבנתם את מצב הצמח, מסדרים את הצמחים במקום הנכון באמצעות גרירה.',
+            text:'אחרי שהבנתם את מצב הצמח, לוחצים על צמח אחד ואז על צמח אחר כדי להחליף ביניהם ולסדר אותם במקום הנכון.',
             plant:'v', meter:'normal', fill:88, animation:'drag'
         }
     ];
@@ -1726,7 +1807,6 @@ html, body {
 
     function startLabSession() {
         gameActive = true;
-        preloadStage1Visuals();
         renderBoard();
 
         timerInterval = setInterval(() => {
@@ -1782,191 +1862,96 @@ html, body {
         return "filter: none;";
     }
 
-    // One global lock for plant movement. Only ONE plant can be selected/dragged at a time.
-    let activePlantDrag = null;
-
-    function getPlantLayersMarkup(p) {
-        const op = getSmoothOpacities(p);
-        return `
-            <div class="plant-container" style="${getPlantVisualStyle(p)}">
-                <img src="${p.src}" class="plant-layer plant-normal-layer" style="opacity:${isIRActive ? 0 : 1};" alt="plant">
-                <img src="${p.irBase}H.png" class="plant-layer plant-ir-layer plant-ir-h" style="opacity:${isIRActive ? op.h : 0};" alt="plant H">
-                <img src="${p.irBase}N.png" class="plant-layer plant-ir-layer plant-ir-n" style="opacity:${isIRActive ? op.n : 0};" alt="plant N">
-                <img src="${p.irBase}T.png" class="plant-layer plant-ir-layer plant-ir-t" style="opacity:${isIRActive ? op.t : 0};" alt="plant T">
-            </div>
-        `;
-    }
+    window.selectedPlantIndex = null;
 
     function renderBoard() {
         const row = document.getElementById('slots-row');
         row.innerHTML = '';
-
         plants.forEach((p, idx) => {
             const slot = document.createElement('div');
             slot.className = 'plant-slot';
             if (targetWateringIndex === idx) slot.classList.add('watering-active');
-            slot.draggable = true;
 
-            slot.addEventListener('dragstart', (e) => {
-                // Prevent a second plant from becoming active while another drag is alive.
-                if (activePlantDrag && activePlantDrag.fromIdx !== idx) {
-                    e.preventDefault();
+            slot.draggable = false;
+
+            // Desktop + mobile: select one plant, then another plant to swap them.
+            // No simultaneous drag/pointer state exists, so two plants cannot be held at once.
+            slot.addEventListener('click', (e) => {
+                if (e.target.closest('.water-meter-container')) return;
+                const slots = Array.from(document.querySelectorAll('.plant-slot'));
+                const idxNow = slots.indexOf(slot);
+                if (idxNow < 0) return;
+
+                if (window.selectedPlantIndex === null || window.selectedPlantIndex === undefined) {
+                    window.selectedPlantIndex = idxNow;
+                    slot.classList.add('plant-selected');
                     return;
                 }
-                activePlantDrag = { type:'native', fromIdx:idx };
-                e.dataTransfer.setData('text/plain', 'plant_' + idx);
-            });
-            slot.addEventListener('dragend', () => { activePlantDrag = null; });
-            slot.addEventListener('dragover', (e) => {
-                if (activePlantDrag && activePlantDrag.type === 'native') e.preventDefault();
-            });
-            slot.addEventListener('drop', (e) => {
-                e.preventDefault();
-                const data = e.dataTransfer.getData('text/plain');
-                if (data.startsWith('plant_')) {
-                    const fromIdx = parseInt(data.split('_')[1]);
-                    if (fromIdx !== idx) {
-                        const temp = plants[fromIdx];
-                        plants[fromIdx] = plants[idx];
-                        plants[idx] = temp;
-                    }
+
+                const first = window.selectedPlantIndex;
+                if (first === idxNow) {
+                    slot.classList.remove('plant-selected');
+                    window.selectedPlantIndex = null;
+                    return;
                 }
-                activePlantDrag = null;
+
+                const temp = plants[first];
+                plants[first] = plants[idxNow];
+                plants[idxNow] = temp;
+                window.selectedPlantIndex = null;
                 renderBoard();
             });
 
-            slot.addEventListener('pointerdown', (e) => {
-                if (e.pointerType === 'mouse') return;
-                if (e.target.closest('.water-meter-container')) return;
-
-                // HARD LOCK: if any other plant is already selected, ignore this touch completely.
-                if (activePlantDrag) return;
-
-                e.preventDefault();
-                const source = slot.querySelector('.plant-container');
-                if (!source) return;
-
-                slot.setPointerCapture?.(e.pointerId);
-                const rect = source.getBoundingClientRect();
-                const ghost = source.cloneNode(true);
-                ghost.className = 'plant-drag-ghost';
-                ghost.style.width = rect.width + 'px';
-                ghost.style.height = rect.height + 'px';
-                ghost.style.left = (e.clientX - rect.width / 2) + 'px';
-                ghost.style.top = (e.clientY - rect.height / 2) + 'px';
-                document.body.appendChild(ghost);
-
-                source.style.opacity = '0.28';
-                slot.classList.add('drag-source');
-                activePlantDrag = { type:'pointer', id:e.pointerId, fromIdx:idx, ghost, source, slot };
-            }, {passive:false});
-
-            slot.addEventListener('pointermove', (e) => {
-                if (!activePlantDrag || activePlantDrag.type !== 'pointer' || activePlantDrag.id !== e.pointerId) return;
-                e.preventDefault();
-
-                const ghost = activePlantDrag.ghost;
-                ghost.style.left = (e.clientX - ghost.offsetWidth / 2) + 'px';
-                ghost.style.top = (e.clientY - ghost.offsetHeight / 2) + 'px';
-
-                document.querySelectorAll('.plant-slot').forEach(target => target.classList.remove('drag-over'));
-                const target = [...document.querySelectorAll('.plant-slot')].find(target => {
-                    const r = target.getBoundingClientRect();
-                    return e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
-                });
-                if (target) target.classList.add('drag-over');
-            }, {passive:false});
-
-            const finishPointerDrag = (e) => {
-                if (!activePlantDrag || activePlantDrag.type !== 'pointer' || activePlantDrag.id !== e.pointerId) return;
-                e.preventDefault();
-
-                const drag = activePlantDrag;
-                const fromIdx = drag.fromIdx;
-                const target = [...document.querySelectorAll('.plant-slot')].find(target => {
-                    const r = target.getBoundingClientRect();
-                    return e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
-                });
-                const toIdx = target ? [...document.querySelectorAll('.plant-slot')].indexOf(target) : -1;
-
-                if (toIdx >= 0 && toIdx !== fromIdx) {
-                    const temp = plants[fromIdx];
-                    plants[fromIdx] = plants[toIdx];
-                    plants[toIdx] = temp;
-                }
-
-                drag.ghost?.remove();
-                drag.source.style.opacity = '';
-                drag.slot.classList.remove('drag-source');
-                document.querySelectorAll('.plant-slot').forEach(target => target.classList.remove('drag-over'));
-
-                // Release the lock BEFORE rerendering.
-                activePlantDrag = null;
-                renderBoard();
-            };
-
-            slot.addEventListener('pointerup', finishPointerDrag, {passive:false});
-            slot.addEventListener('pointercancel', finishPointerDrag, {passive:false});
+            let visualStyle = getPlantVisualStyle(p);
+            let innerMarkup = '';
+            if (!isIRActive) {
+                innerMarkup = `<div class="plant-container" style="${visualStyle}"><img src="${p.src}" class="plant-layer" style="opacity: 1;" alt="plant"></div>`;
+            } else {
+                let op = getSmoothOpacities(p);
+                innerMarkup = `
+                    <div class="plant-container" style="${visualStyle}">
+                        <img src="${p.irBase}H.png" class="plant-layer" style="opacity: ${op.h};" alt="plant H">
+                        <img src="${p.irBase}N.png" class="plant-layer" style="opacity: ${op.n};" alt="plant N">
+                        <img src="${p.irBase}T.png" class="plant-layer" style="opacity: ${op.t};" alt="plant T">
+                    </div>
+                `;
+            }
 
             slot.innerHTML = `
-                ${getPlantLayersMarkup(p)}
+                ${innerMarkup}
                 <div class="water-meter-container" title="רמת מים: ${Math.floor(p.water)}%">
-                    <div class="water-meter-fill" style="width:${p.water}%;"></div>
+                    <div class="water-meter-fill" style="width: ${p.water}%;"></div>
                 </div>
             `;
             row.appendChild(slot);
         });
     }
 
-    // Update only the pixels that changed; never rebuild the board during IR switching.
     function updateLiveValues() {
         const slots = document.querySelectorAll('.plant-slot');
-
         plants.forEach((p, idx) => {
-            const slot = slots[idx];
-            if (!slot) return;
+            if (slots[idx]) {
+                const fill = slots[idx].querySelector('.water-meter-fill');
+                if (fill) fill.style.width = p.water + '%';
+                slots[idx].querySelector('.water-meter-container').title = `רמת מים: ${Math.floor(p.water)}%`;
 
-            const fill = slot.querySelector('.water-meter-fill');
-            if (fill) fill.style.width = p.water + '%';
-
-            const meter = slot.querySelector('.water-meter-container');
-            if (meter) meter.title = `רמת מים: ${Math.floor(p.water)}%`;
-
-            const containerEl = slot.querySelector('.plant-container');
-            if (!containerEl) return;
-
-            if (isIRActive) {
-                const op = getSmoothOpacities(p);
-                const h = containerEl.querySelector('.plant-ir-h');
-                const n = containerEl.querySelector('.plant-ir-n');
-                const t = containerEl.querySelector('.plant-ir-t');
-                if (h) h.style.opacity = op.h;
-                if (n) n.style.opacity = op.n;
-                if (t) t.style.opacity = op.t;
+                const containerEl = slots[idx].querySelector('.plant-container');
+                if (containerEl) {
+                    containerEl.style.cssText = `position: relative; width: 75px; height: 75px; margin-bottom: 8px; ${getPlantVisualStyle(p)}`;
+                    if (isIRActive) {
+                        let op = getSmoothOpacities(p);
+                        let imgs = containerEl.querySelectorAll('.plant-layer');
+                        if (imgs.length >= 3) {
+                            imgs[0].style.opacity = op.h;
+                            imgs[1].style.opacity = op.n;
+                            imgs[2].style.opacity = op.t;
+                        } else { renderBoard(); }
+                    } else {
+                        let imgEl = containerEl.querySelector('.plant-layer');
+                        if (imgEl && imgEl.getAttribute('src') !== p.src) imgEl.setAttribute('src', p.src);
+                    }
+                }
             }
-        });
-    }
-
-    // Decode every IR/normal plant image before the player presses the glasses.
-    // This removes the first-switch hitch caused by image decoding/loading.
-    function preloadStage1Visuals() {
-        const sources = new Set();
-        plants.forEach(p => {
-            sources.add(p.src);
-            sources.add(`${p.irBase}H.png`);
-            sources.add(`${p.irBase}N.png`);
-            sources.add(`${p.irBase}T.png`);
-        });
-        sources.add('Planlightlvl1bkg.png');
-        sources.add('Planlightlvl1bkgIRV.png');
-        sources.add('watermeterempty.png');
-        sources.add('watermeterfull.png');
-        sources.add('watermeterIR.png');
-
-        sources.forEach(src => {
-            const img = new Image();
-            img.src = src;
-            img.decode?.().catch(() => {});
         });
     }
 
@@ -2046,34 +2031,18 @@ html, body {
     }
 
     function toggleIR() {
+    if (window.preloadQuantumVisuals) window.preloadQuantumVisuals();
         isIRActive = !isIRActive;
         const container = document.getElementById('game-container');
         const glassesBtn = document.getElementById('glasses-toggle');
-
-        // All plant layers already exist and are preloaded. Only opacity/class state changes.
-        container.classList.toggle('ir-mode', isIRActive);
-        glassesBtn.classList.toggle('active', isIRActive);
-
-        document.querySelectorAll('.plant-slot').forEach((slot, idx) => {
-            const p = plants[idx];
-            const normal = slot.querySelector('.plant-normal-layer');
-            const h = slot.querySelector('.plant-ir-h');
-            const n = slot.querySelector('.plant-ir-n');
-            const t = slot.querySelector('.plant-ir-t');
-
-            if (isIRActive) {
-                const op = getSmoothOpacities(p);
-                if (normal) normal.style.opacity = 0;
-                if (h) h.style.opacity = op.h;
-                if (n) n.style.opacity = op.n;
-                if (t) t.style.opacity = op.t;
-            } else {
-                if (normal) normal.style.opacity = 1;
-                if (h) h.style.opacity = 0;
-                if (n) n.style.opacity = 0;
-                if (t) t.style.opacity = 0;
-            }
-        });
+        if (isIRActive) {
+            container.classList.add('ir-mode');
+            glassesBtn.classList.add('active');
+        } else {
+            container.classList.remove('ir-mode');
+            glassesBtn.classList.remove('active');
+        }
+        renderBoard();
     }
 
     function openConfirmModal() {
@@ -2157,39 +2126,72 @@ html, body {
     }
 
     function typeWriter(text, callback) {
+        // Desktop keeps the original smooth cadence. On phones we deliberately
+        // update the DOM less often: the phone still receives speech-like timing,
+        // but avoids a layout/repaint on every single character.
         if (window.__typeWriterCancel) window.__typeWriterCancel();
-
         textElement.textContent = "";
-        const isMobile = window.matchMedia('(max-width: 700px), (pointer: coarse)').matches;
-        const speed = isMobile ? 5 : 30;
 
-        let index = 0;
+        const mobile = window.matchMedia('(max-width: 700px)').matches;
+        let finished = false;
+        let rafId = null;
         let timerId = null;
-        let cancelled = false;
+        let index = 0;
+        const started = performance.now();
 
-        window.__typeWriterCancel = () => {
-            cancelled = true;
+        const finish = () => {
+            if (finished) return;
+            finished = true;
+            if (rafId) cancelAnimationFrame(rafId);
             if (timerId) clearTimeout(timerId);
+            textElement.textContent = text;
             window.__typeWriterCancel = null;
+            if (callback) callback();
         };
 
-        function typeNext() {
-            if (cancelled) return;
+        window.__typeWriterCancel = () => {
+            finished = true;
+            if (rafId) cancelAnimationFrame(rafId);
+            if (timerId) clearTimeout(timerId);
+        };
 
-            if (index >= text.length) {
-                window.__typeWriterCancel = null;
-                if (callback) callback();
-                return;
-            }
-
-            // Always append exactly one character per tick.
-            textElement.textContent += text.charAt(index);
-            index++;
-
-            timerId = setTimeout(typeNext, speed);
+        if (mobile) {
+            // ~32ms/character is close to natural spoken pacing.
+            // Render in ~55ms batches so a phone does not reflow the dialogue
+            // for every character. The visible result is still continuous.
+            const charMs = 32;
+            const frameMs = 55;
+            const tick = () => {
+                if (finished) return;
+                const elapsed = performance.now() - started;
+                const target = Math.min(text.length, Math.floor(elapsed / charMs));
+                if (target > index) {
+                    index = target;
+                    textElement.textContent = text.slice(0, index);
+                }
+                if (index >= text.length) {
+                    finish();
+                    return;
+                }
+                timerId = setTimeout(tick, frameMs);
+            };
+            timerId = setTimeout(tick, frameMs);
+            return;
         }
 
-        typeNext();
+        // Desktop: preserve the original smooth 30ms-per-character feel.
+        const speed = 30;
+        const tick = (now) => {
+            if (finished) return;
+            const count = Math.min(text.length, Math.floor((now - started) / speed));
+            if (count !== index) {
+                index = count;
+                textElement.textContent = text.slice(0, index);
+            }
+            if (index >= text.length) finish();
+            else rafId = requestAnimationFrame(tick);
+        };
+        rafId = requestAnimationFrame(tick);
     }
 
     function setChoices(choicesArray) {
@@ -3172,5 +3174,31 @@ async function saveFinalCard(){
  const draw=()=>{ctx.drawImage(img,0,0,w,h);const name=localStorage.getItem('playerName')||'חוקר';const s1=Number(localStorage.getItem('stage1Score')||0),s2=Number(localStorage.getItem('stage2Score')||0),s3=Number(localStorage.getItem('stage3Score')||0);ctx.direction='rtl';ctx.textAlign='center';ctx.fillStyle='#fff';ctx.font=`900 ${Math.round(w*.045)}px Arial`;ctx.fillText(name,w*.5,h*.22);ctx.textAlign='right';ctx.font=`700 ${Math.round(w*.022)}px Arial`;ctx.fillText(`שלב 1 · ${s1}/100`,w*.88,h*.40);ctx.fillText(`דני · ${s2}/100`,w*.88,h*.46);ctx.fillText(`שלב 3 · ${s3}/100`,w*.88,h*.52);ctx.font=`900 ${Math.round(w*.05)}px Arial`;ctx.fillText(`${s1+s2+s3} / 300`,w*.88,h*.78);canvas.toBlob(async blob=>{if(!blob)return;const file=new File([blob],'Quantum-Station-score.png',{type:'image/png'});if(navigator.share && navigator.canShare && navigator.canShare({files:[file]})){try{await navigator.share({files:[file],title:'Quantum Station',text:'שתפו אותנו בתחנת קוונטום'});return}catch(e){}}const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='Quantum-Station-score.png';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);},'image/png');};
  if(img.complete && img.naturalWidth) draw(); else img.onload=draw;
 }
+</script>
+
+<script>
+(function(){
+  const IR_ASSETS = [
+    'leavesIRN.png','leavesIRT.png','leavesIRH.png',
+    'watermeterIR.png','watermeterfull.png','watermeterempty.png',
+    'leavesV.png','cactusV.png','orchidV.png','succulentV.png','sunflowerV.png'
+  ];
+  const irCache = new Map();
+  function preloadImage(src){
+    if(irCache.has(src)) return irCache.get(src);
+    const img = new Image();
+    const promise = new Promise(resolve=>{
+      img.onload = async ()=>{ try { if(img.decode) await img.decode(); } catch(_){} resolve(img); };
+      img.onerror = ()=>resolve(img);
+    });
+    img.src = src;
+    irCache.set(src,promise);
+    return promise;
+  }
+  window.preloadQuantumVisuals = function(){
+    return Promise.all(IR_ASSETS.map(preloadImage));
+  };
+  window.preloadQuantumVisuals();
+})();
 </script>
 </body>
