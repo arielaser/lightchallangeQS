@@ -527,9 +527,9 @@
             color:#67e8f9; font-size:10px; font-weight:900;
             box-shadow:0 0 0 0 rgba(56,189,248,.0);
         }
-        .left-badge{left:8px}.right-badge{right:8px}
-        .lesson-drag-demo.play .left-badge { animation:lessonClickOne 2.8s ease .25s infinite; }
-        .lesson-drag-demo.play .right-badge { animation:lessonClickTwo 2.8s ease .25s infinite; }
+        .left-drag-badge{left:8px}.right-drag-badge{right:8px}
+        .lesson-drag-demo.play .left-drag-badge { animation:lessonClickOne 2.8s ease .25s infinite; }
+        .lesson-drag-demo.play .right-drag-badge { animation:lessonClickTwo 2.8s ease .25s infinite; }
         .lesson-drag-demo.play .lesson-drag-plant.left-plant { animation:lessonPlantClickSwapLeft 2.8s cubic-bezier(.22,.8,.25,1) .25s infinite; }
         .lesson-drag-demo.play .lesson-drag-plant.right-plant { animation:lessonPlantClickSwapRight 2.8s cubic-bezier(.22,.8,.25,1) .25s infinite; }
 
@@ -1421,11 +1421,11 @@ html, body {
                 </div>
                 <div id="lesson-drag-demo" class="lesson-drag-demo play" aria-label="הדגמת החלפת צמחים בלחיצה">
                     <div class="lesson-drag-slot left">
-                        <span class="lesson-click-badge left-badge">1</span>
+                        <span class="lesson-click-badge left-drag-badge">1</span>
                         <img class="lesson-drag-plant left-plant" src="leavesV.png" alt="leavesV">
                     </div>
                     <div class="lesson-drag-slot right">
-                        <span class="lesson-click-badge right-badge">2</span>
+                        <span class="lesson-click-badge right-drag-badge">2</span>
                         <img class="lesson-drag-plant right-plant" src="cactusV.png" alt="cactusV">
                     </div>
                     <div class="lesson-drag-arrow">↔</div>
@@ -2731,7 +2731,7 @@ html, body {
                     <h3 style="color: #f3f4f6; margin-bottom: 5px; font-size: 16px;">מבחן Farnsworth-Munsell</h3>
                     <div class="fm-instructions">
                         <b>סדרו את העיגולים מימין לשמאל</b> (מהאדום אל הירוק).<br>
-                        לחצו על עיגול לבחירה, ואז על עיגול אחר להחלפה.
+                        גררו צמח אחד אל המקום של צמח אחר כדי להחליף ביניהם.
                     </div>
                 </div>
                 <div class="center-content-box">
@@ -3216,157 +3216,181 @@ async function saveFinalCard(){
 })();
 </script>
 
-/* v17: single-pointer plant drag/swap */
-(function setupPlantDragV17(){
-  const root = document.querySelector('#stage1-screen') || document;
-  const plants = Array.from(root.querySelectorAll(
-    '.plant, .plant-item, .plant-card, [data-plant], .draggable-plant'
-  )).filter(el => !el.closest('#plantTutorial'));
 
-  if (!plants.length) return;
+<script id="plant-drag-v18">
+(function setupPlantDragV18(){
+  const slots = Array.from(document.querySelectorAll('#slots-row .plant-slot'));
+  if (!slots.length) return;
 
   let active = null;
 
-  const cleanup = () => {
+  function clearTargets(){
+    slots.forEach(slot => slot.classList.remove('plant-drop-target'));
+  }
+
+  function cleanup(){
     if (!active) return;
-    const {el, ghost, pointerId} = active;
-    try { el.releasePointerCapture?.(pointerId); } catch(e) {}
-    el.classList.remove('plant-dragging');
-    if (ghost?.parentNode) ghost.parentNode.removeChild(ghost);
-    plants.forEach(p => {
-      p.style.pointerEvents = '';
-      p.classList.remove('plant-drop-target');
-    });
-    active = null;
-  };
+    const {source, ghost, pointerId} = active;
 
-  const makeGhost = (el, x, y) => {
-    const r = el.getBoundingClientRect();
-    const g = el.cloneNode(true);
-    g.classList.add('plant-drag-ghost');
-    g.removeAttribute('id');
-    Object.assign(g.style, {
-      position:'fixed',
-      left:'0px',
-      top:'0px',
-      width:r.width+'px',
-      height:r.height+'px',
-      margin:'0',
-      pointerEvents:'none',
-      zIndex:'99999',
-      transform:`translate3d(${x-r.width/2}px,${y-r.height/2}px,0)`,
-      opacity:'0.92'
-    });
-    document.body.appendChild(g);
-    return g;
-  };
+    try { source.releasePointerCapture(pointerId); } catch (_) {}
+    source.classList.remove('plant-dragging');
 
-  const moveGhost = (ghost, x, y) => {
-    if (!ghost) return;
-    const r = ghost.getBoundingClientRect();
-    ghost.style.transform =
-      `translate3d(${x-r.width/2}px,${y-r.height/2}px,0)`;
-  };
-
-  const getTarget = (x, y, source) => {
-    const hit = document.elementFromPoint(x, y);
-    if (!hit) return null;
-    const target = plants.find(p => p === hit || p.contains(hit));
-    return target && target !== source ? target : null;
-  };
-
-  const onDown = (ev) => {
-    // Absolutely no second plant can be selected while one is held.
-    if (active || ev.button === 2) return;
-
-    const el = plants.find(p => p === ev.currentTarget);
-    if (!el) return;
-
-    ev.preventDefault();
-    active = {
-      el,
-      pointerId: ev.pointerId,
-      ghost: makeGhost(el, ev.clientX, ev.clientY)
-    };
-
-    el.classList.add('plant-dragging');
-
-    // Lock every other plant for the entire drag.
-    plants.forEach(p => {
-      if (p !== el) p.style.pointerEvents = 'none';
-    });
-
-    try { el.setPointerCapture(ev.pointerId); } catch(e) {}
-  };
-
-  const onMove = (ev) => {
-    if (!active || ev.pointerId !== active.pointerId) return;
-    ev.preventDefault();
-
-    moveGhost(active.ghost, ev.clientX, ev.clientY);
-
-    plants.forEach(p => p.classList.remove('plant-drop-target'));
-    const target = getTarget(ev.clientX, ev.clientY, active.el);
-    if (target) target.classList.add('plant-drop-target');
-  };
-
-  const onUp = (ev) => {
-    if (!active || ev.pointerId !== active.pointerId) return;
-    ev.preventDefault();
-
-    const source = active.el;
-    const target = getTarget(ev.clientX, ev.clientY, source);
-
-    if (target) {
-      // Swap the actual DOM positions. This preserves the existing plant data,
-      // images, labels and scoring hooks attached to each plant element.
-      const sourceNext = source.nextSibling;
-      const targetNext = target.nextSibling;
-      const parent = source.parentNode;
-
-      if (parent === target.parentNode) {
-        if (sourceNext === target) {
-          parent.insertBefore(target, source);
-        } else if (targetNext === source) {
-          parent.insertBefore(source, target);
-        } else {
-          parent.insertBefore(source, targetNext);
-          parent.insertBefore(target, sourceNext);
-        }
-      }
+    if (ghost && ghost.parentNode) {
+      ghost.parentNode.removeChild(ghost);
     }
 
+    slots.forEach(slot => {
+      slot.style.pointerEvents = '';
+      slot.classList.remove('plant-drop-target');
+    });
+
+    active = null;
+  }
+
+  function createGhost(source, x, y){
+    const rect = source.getBoundingClientRect();
+    const ghost = source.cloneNode(true);
+
+    ghost.removeAttribute('id');
+    ghost.classList.add('plant-drag-ghost');
+
+    Object.assign(ghost.style, {
+      position: 'fixed',
+      left: '0',
+      top: '0',
+      width: rect.width + 'px',
+      height: rect.height + 'px',
+      margin: '0',
+      pointerEvents: 'none',
+      zIndex: '999999',
+      opacity: '.92',
+      transform: `translate3d(${x - rect.width / 2}px, ${y - rect.height / 2}px, 0)`
+    });
+
+    document.body.appendChild(ghost);
+    return ghost;
+  }
+
+  function moveGhost(ghost, x, y){
+    const rect = ghost.getBoundingClientRect();
+    ghost.style.transform =
+      `translate3d(${x - rect.width / 2}px, ${y - rect.height / 2}px, 0)`;
+  }
+
+  function findTarget(x, y, source){
+    const hit = document.elementFromPoint(x, y);
+    if (!hit) return null;
+
+    const target = slots.find(slot => slot === hit || slot.contains(hit));
+    return target && target !== source ? target : null;
+  }
+
+  function swapSlots(a, b){
+    if (!a || !b || a === b || a.parentNode !== b.parentNode) return;
+
+    const parent = a.parentNode;
+    const aNext = a.nextSibling;
+    const bNext = b.nextSibling;
+
+    if (aNext === b) {
+      parent.insertBefore(b, a);
+    } else if (bNext === a) {
+      parent.insertBefore(a, b);
+    } else {
+      parent.insertBefore(a, bNext);
+      parent.insertBefore(b, aNext);
+    }
+  }
+
+  function onPointerDown(event){
+    // Absolute one-at-a-time lock: another pointer cannot start a drag.
+    if (active) return;
+    if (event.pointerType === 'mouse' && event.button !== 0) return;
+
+    const source = event.currentTarget;
+    if (!source) return;
+
+    event.preventDefault();
+
+    active = {
+      source,
+      pointerId: event.pointerId,
+      ghost: createGhost(source, event.clientX, event.clientY)
+    };
+
+    source.classList.add('plant-dragging');
+
+    // Lock every other plant while this one is held.
+    slots.forEach(slot => {
+      if (slot !== source) slot.style.pointerEvents = 'none';
+    });
+
+    try { source.setPointerCapture(event.pointerId); } catch (_) {}
+  }
+
+  function onPointerMove(event){
+    if (!active || event.pointerId !== active.pointerId) return;
+
+    event.preventDefault();
+    moveGhost(active.ghost, event.clientX, event.clientY);
+
+    clearTargets();
+    const target = findTarget(event.clientX, event.clientY, active.source);
+    if (target) target.classList.add('plant-drop-target');
+  }
+
+  function onPointerUp(event){
+    if (!active || event.pointerId !== active.pointerId) return;
+
+    event.preventDefault();
+
+    const source = active.source;
+    const target = findTarget(event.clientX, event.clientY, source);
+
+    if (target) swapSlots(source, target);
+
     cleanup();
-  };
+  }
 
-  const onCancel = (ev) => {
-    if (active && ev.pointerId === active.pointerId) cleanup();
-  };
+  function onPointerCancel(event){
+    if (active && event.pointerId === active.pointerId) cleanup();
+  }
 
-  plants.forEach(el => {
-    el.style.touchAction = 'none';
-    el.addEventListener('pointerdown', onDown, {passive:false});
-    el.addEventListener('pointermove', onMove, {passive:false});
-    el.addEventListener('pointerup', onUp, {passive:false});
-    el.addEventListener('pointercancel', onCancel, {passive:false});
+  slots.forEach(slot => {
+    slot.style.touchAction = 'none';
+    slot.addEventListener('pointerdown', onPointerDown, {passive:false});
+    slot.addEventListener('pointermove', onPointerMove, {passive:false});
+    slot.addEventListener('pointerup', onPointerUp, {passive:false});
+    slot.addEventListener('pointercancel', onPointerCancel, {passive:false});
   });
 
   const style = document.createElement('style');
   style.textContent = `
-    .plant-dragging{
-      opacity:.38 !important;
+    #slots-row .plant-slot{
+      touch-action:none;
+      user-select:none;
+      -webkit-user-select:none;
+    }
+
+    #slots-row .plant-slot.plant-dragging{
+      opacity:.35 !important;
       cursor:grabbing !important;
     }
+
     .plant-drag-ghost{
       will-change:transform;
-      filter:drop-shadow(0 10px 16px rgba(0,0,0,.22));
+      filter:drop-shadow(0 10px 16px rgba(0,0,0,.28));
+      pointer-events:none !important;
     }
-    .plant-drop-target{
-      outline:3px solid rgba(56,189,248,.9) !important;
+
+    #slots-row .plant-slot.plant-drop-target{
+      outline:3px solid rgba(56,189,248,.95) !important;
       outline-offset:4px;
+      border-radius:10px;
     }
   `;
   document.head.appendChild(style);
 })();
+</script>
 
 </body>
