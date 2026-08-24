@@ -2715,11 +2715,12 @@ html, body {
           <div class="card-overlay-total" id="card-total">-- / 300</div>
           <div class="shine"></div>
         </div>
-        <a class="share-caption" href="https://discord.gg/zEzXmZ9CKX" target="_blank" rel="noopener noreferrer">שתפו אותנו בתחנת קוונטום</a>
+        <p class="medical-note">המידע אינו מידע רפואי</p>
+        <p class="share-prompt">סיימת את האתגר! רוצה להשוות את הציון שלך עם חוקרים אחרים או לנסות אתגרים קשים יותר? היכנס עכשיו לדיסקורד של תחנת קוונטום</p>
+        <a class="share-caption" href="https://discord.gg/zEzXmZ9CKX" target="_blank" rel="noopener noreferrer">הצטרפו לדיסקורד</a>
         <p class="share-prompt">כל חוקר צריך מישהו שיאתגר אותו.
 אז... מי מהחברים שלכם יצליח יותר?</p>
         <button type="button" class="share-caption challenge-friend-btn" id="challenge-friend-btn">אתגר חבר</button>
-        <p class="medical-note">המידע אינו מידע רפואי</p>
         <div class="results-grid">
           <section class="result-panel"><h3>סימולטור אינפרא אדום</h3><div class="score-big" id="detail-stage1-score">0 / 100</div><div id="stage1-order-detail"></div></section>
           <section class="result-panel"><h3>מעבדת התפיסה</h3><div class="score-big" id="detail-stage2-score">0 / 100</div><div id="stage2-detail"></div></section>
@@ -3300,7 +3301,7 @@ async function saveFinalCard(){
 }
 async function shareChallengeWithFriend(){
   const url='https://qslighttest.online/';
-  const text='רציתי להזמין אותך לנסות את אתגר האור.\nבהצלחה! 🚀';
+  const text='כל חוקר צריך מישהו שיאתגר אותו.\nאז... מי מהחברים שלכם יצליח יותר? 🚀';
   if(navigator.share){
     try{
       await navigator.share({title:'Quantum Station',text,url});
