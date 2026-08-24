@@ -87,8 +87,8 @@
         /* --- Spectrum Track --- */
         #spectrum-intro-track {
             position: relative;
-            width: 320px;
-            height: 14px;
+            width: 400px;
+            height: 22px;
             background: #000000;
             border-radius: 7px;
             margin: 12px 0;
@@ -99,7 +99,7 @@
 
         #spectrum-intro-fill {
             position: absolute;
-            top: 0; left: 25%; width: 50%; height: 100%;
+            top: 0; left: 0; width: 0; height: 100%;
             background: linear-gradient(90deg, 
                 red 0%, 
                 orange 17%, 
@@ -110,17 +110,18 @@
                 violet 100%
             );
             box-shadow: 0 0 12px rgba(0, 255, 204, 0.4);
-            animation: spectrumIntroExpand 0.8s cubic-bezier(.22,.8,.25,1) .25s forwards;
-            transform-origin: center;
+            animation: none;
+            transform-origin: left center;
         }
 
         @keyframes spectrumIntroExpand {
-            0%   { left: 25%; width: 50%; }
-            100% { left: 0%; width: 100%; }
+            0%   { left: 0; width: 0; }
+            100% { left: 0; width: 100%; }
         }
 
         .spectrum-labels {
-            display: flex;
+            display: none;
+            flex: none;
             justify-content: space-between;
             width: 320px;
             font-size: 8px;
@@ -136,21 +137,6 @@
             font-weight: 600;
             margin-bottom: 15px;
             letter-spacing: 0.5px;
-        }
-
-        #start-shift-btn {
-            background: #1e293b;
-            color: #f8fafc;
-            border: 1px solid #475569;
-            padding: 9px 22px;
-            font-size: 13px;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        #start-shift-btn:hover {
-            background: #334155;
-            border-color: #64748b;
         }
 
         /* --- Tutorial Overlay --- */
@@ -464,6 +450,99 @@
         #lesson-overlay.step-1.playing .lesson-meter-fill { width:88%; transition-delay:1.15s; }
         @keyframes lessonCup { 0%{opacity:0;transform:translate(35px,-25px) rotate(0)} 20%{opacity:1} 60%{opacity:1;transform:translate(-105px,72px) rotate(23deg)} 85%{opacity:1;transform:translate(-105px,72px) rotate(23deg)} 100%{opacity:0;transform:translate(-105px,72px) rotate(23deg)} }
         @keyframes lessonWater { 0%{opacity:0;height:0} 15%{opacity:1} 80%{opacity:1;height:105px} 100%{opacity:0;height:105px} }
+        .lesson-water-demo {
+            position:absolute; width:330px; height:255px; left:50%; top:45px; transform:translateX(-50%);
+            display:none; align-items:flex-end; justify-content:center; overflow:visible;
+        }
+        .lesson-water-plants {
+            position:absolute; left:20px; right:20px; bottom:62px; height:160px;
+            display:flex; align-items:flex-end; justify-content:space-between;
+        }
+        .lesson-water-plant { position:relative; width:86px; height:150px; display:flex; align-items:flex-end; justify-content:center; }
+        .lesson-water-plant img { width:82px; height:132px; object-fit:contain; filter:drop-shadow(0 5px 8px rgba(0,0,0,.35)); }
+        .lesson-water-meter-row {
+            position:absolute; left:26px; right:26px; bottom:28px; display:flex; justify-content:space-between;
+            direction:ltr;
+        }
+        .lesson-water-meter { position:relative; width:72px; height:28px; flex:0 0 72px; }
+        .lesson-water-meter::before {
+            content:''; position:absolute; inset:0;
+            background:url('watermeterempty.png') center/72px 28px no-repeat;
+        }
+        .lesson-water-meter-fill {
+            position:absolute; left:0; top:0; height:100%; width:0%; overflow:hidden;
+            background:url('watermeterfull.png') left center/72px 28px no-repeat;
+            -webkit-mask-image:url('watermeterfull.png'); mask-image:url('watermeterfull.png');
+            -webkit-mask-repeat:no-repeat; mask-repeat:no-repeat;
+            -webkit-mask-position:left center; mask-position:left center;
+            -webkit-mask-size:72px 28px; mask-size:72px 28px;
+        }
+        .lesson-water-cup {
+            position:absolute; width:42px; height:52px; left:5px; top:2px; border:2px solid #22d3ee;
+            border-radius:4px 4px 10px 10px; background:linear-gradient(135deg,#164e63,#083344);
+            box-shadow:0 4px 10px rgba(0,0,0,.45); opacity:0;
+        }
+        .lesson-water-cup::before { content:''; position:absolute; left:-11px; top:7px; width:10px; height:23px; border:2px solid #22d3ee; border-right:0; border-radius:7px 0 0 7px; }
+        .lesson-water-stream {
+            position:absolute; width:4px; height:0; left:26px; top:50px; background:#38bdf8; border-radius:4px;
+            opacity:0; box-shadow:0 0 8px rgba(56,189,248,.8); transform-origin:top;
+        }
+        .step-1 #lesson-plant-wrap, .step-1 #lesson-meter, .step-1 #lesson-cup, .step-1 #lesson-stream { display:none !important; }
+        .step-1 #lesson-water-demo { display:flex; }
+        #lesson-overlay.step-1.playing .lesson-water-cup { animation:lessonWaterCup 3.9s cubic-bezier(.2,.78,.22,1) forwards; }
+        #lesson-overlay.step-1.playing .lesson-water-stream { animation:lessonWaterStream 3.9s linear forwards; }
+        #lesson-overlay.step-1.playing .lesson-water-meter:nth-child(1) .lesson-water-meter-fill { animation:lessonMeter1 3.9s linear forwards; }
+        #lesson-overlay.step-1.playing .lesson-water-meter:nth-child(2) .lesson-water-meter-fill { animation:lessonMeter2 3.9s linear forwards; }
+        #lesson-overlay.step-1.playing .lesson-water-meter:nth-child(3) .lesson-water-meter-fill { animation:lessonMeter3 3.9s linear forwards; }
+        @keyframes lessonWaterCup {
+            0%{opacity:0;transform:translate(21px,-34px) rotate(0)}
+            5%{opacity:1;transform:translate(21px,-10px) rotate(18deg)}
+            27%{opacity:1;transform:translate(21px,55px) rotate(20deg)}
+            34%{opacity:1;transform:translate(123px,55px) rotate(20deg)}
+            60%{opacity:1;transform:translate(123px,55px) rotate(20deg)}
+            67%{opacity:1;transform:translate(225px,55px) rotate(20deg)}
+            93%{opacity:1;transform:translate(225px,55px) rotate(20deg)}
+            100%{opacity:0;transform:translate(225px,55px) rotate(20deg)}
+        }
+        @keyframes lessonWaterStream {
+            0%,5%{opacity:0;height:0;left:43px;top:50px}
+            8%{opacity:1;height:55px;left:43px;top:102px}
+            27%{opacity:1;height:55px;left:43px;top:102px}
+            30%{opacity:0;height:0;left:43px;top:102px}
+            34%{opacity:0;height:0;left:145px;top:102px}
+            37%{opacity:1;height:55px;left:145px;top:102px}
+            60%{opacity:1;height:55px;left:145px;top:102px}
+            63%{opacity:0;height:0;left:145px;top:102px}
+            67%{opacity:0;height:0;left:247px;top:102px}
+            70%{opacity:1;height:55px;left:247px;top:102px}
+            93%{opacity:1;height:55px;left:247px;top:102px}
+            100%{opacity:0;height:0;left:247px;top:102px}
+        }
+        @keyframes lessonMeter1 {
+            0%,7%{width:0%} 26%{width:100%} 100%{width:100%}
+        }
+        @keyframes lessonMeter2 {
+            0%,36%{width:0%} 59%{width:100%} 100%{width:100%}
+        }
+        @keyframes lessonMeter3 {
+            0%,69%{width:0%} 92%{width:100%} 100%{width:100%}
+        }
+        .lesson-heat-demo {
+            position:absolute; width:300px; height:250px; left:50%; top:65px; transform:translateX(-50%);
+            display:none; align-items:center; justify-content:center; gap:18px;
+        }
+        .lesson-heat-card {
+            width:125px; height:205px; border:1px solid rgba(148,163,184,.25); border-radius:14px;
+            background:rgba(15,23,42,.78); display:flex; flex-direction:column; align-items:center; justify-content:center;
+            box-shadow:inset 0 0 18px rgba(0,0,0,.25);
+        }
+        .lesson-heat-card img { width:112px; height:150px; object-fit:contain; }
+        .lesson-heat-card span { font-size:10px; font-weight:800; color:#cbd5e1; margin-top:5px; }
+        .step-3 #lesson-plant-wrap, .step-3 #lesson-meter, .step-3 #lesson-cup, .step-3 #lesson-stream { display:none !important; }
+        .step-3 #lesson-heat-demo { display:flex; }
+        .step-4 #lesson-plant-wrap, .step-4 #lesson-meter { display:none !important; }
+        .step-4 #lesson-heat-demo, .step-4 #lesson-water-demo { display:none !important; }
+
         .lesson-glasses { width:180px; height:115px; object-fit:contain; transition:transform .35s ease, filter .35s ease; }
         .lesson-press { position:absolute; top:118px; left:50%; transform:translateX(-50%); width:48px; height:48px; border-radius:50%; border:2px solid rgba(255,255,255,.8); opacity:0; }
         #lesson-overlay.step-2.playing .lesson-glasses { animation:glassesPress 1.25s ease .45s forwards; pointer-events:none; }
@@ -483,6 +562,12 @@
         .lesson-arrow:hover:not(:disabled) { background:#1e293b; transform:scale(1.06); }
         .lesson-arrow:disabled { opacity:.28; cursor:default; }
         .lesson-progress { color:#64748b; font-size:10px; }
+
+
+        .step-1 #lesson-drag-demo, .step-2 #lesson-drag-demo, .step-3 #lesson-drag-demo { display:none !important; }
+        .step-1 #lesson-heat-demo, .step-2 #lesson-heat-demo, .step-4 #lesson-heat-demo { display:none !important; }
+        .step-1 #lesson-water-demo { z-index:3; }
+        .step-3 #lesson-heat-demo { z-index:3; }
 
         /* Step 6: Drag demo */
         #lesson-drag-demo {
@@ -528,8 +613,8 @@
             0%,18%,86%,100%{opacity:.35;transform:translateX(-50%) scale(.9)}
             38%,68%{opacity:1;transform:translateX(-50%) scale(1.08)}
         }
-        .step-6 #lesson-plant-wrap, .step-6 #lesson-glasses, .step-6 #lesson-press, .step-6 #lesson-cup, .step-6 #lesson-stream, .step-6 #lesson-meter { display:none !important; }
-        .step-6 #lesson-drag-demo { display:flex; }
+        .step-4 #lesson-plant-wrap, .step-4 #lesson-glasses, .step-4 #lesson-press, .step-4 #lesson-cup, .step-4 #lesson-stream, .step-4 #lesson-meter { display:none !important; }
+        .step-4 #lesson-drag-demo { display:flex; }
 
         /* =========================================================
            STAGE 2 — STYLES
@@ -667,7 +752,7 @@
  padding:28px 18px 60px;
  box-sizing:border-box;
 }
-.final-wrap{width:100%;max-width:920px;margin:0 auto}.final-card-preview{position:relative;width:min(520px,94%);margin:0 auto 16px;aspect-ratio:1123/794;border-radius:18px;overflow:hidden;box-shadow:0 22px 70px rgba(0,0,0,.5);background:#111}.final-card-preview img{width:100%;height:100%;object-fit:cover}.card-overlay-name{position:absolute;left:50%;top:20%;transform:translateX(-50%);font-size:clamp(18px,3vw,30px);font-weight:900;white-space:nowrap}.card-overlay-scores{position:absolute;right:10%;top:37%;font-size:clamp(11px,1.7vw,16px);line-height:1.7;text-align:right}.card-overlay-total{position:absolute;right:10%;bottom:18%;font-size:clamp(18px,3vw,28px);font-weight:900}.shine{position:absolute;inset:-20% auto -20% -35%;width:18%;transform:skewX(-18deg);background:linear-gradient(90deg,transparent,rgba(255,255,255,.9),transparent);animation:cardShine 1.25s ease-out .2s forwards}.final-title{text-align:center;font-size:22px;margin:0 0 7px}.final-sub{text-align:center;color:#94a3b8;margin:0 0 12px;font-size:11px}.save-card{display:block;margin:0 auto 4px;padding:11px 20px;border:1px solid #38bdf8;border-radius:11px;background:#0b1625;color:#e0f2fe;font-weight:900;cursor:pointer}.share-caption{text-align:center;margin:0;color:#e2e8f0;font-size:13px}.medical-note{text-align:center;color:#64748b;font-size:10px;margin:4px 0 22px}.results-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.result-panel{background:rgba(15,23,42,.82);border:1px solid rgba(148,163,184,.18);border-radius:15px;padding:15px}.result-panel h3{margin:0 0 10px;font-size:15px}.score-big{font-size:24px;font-weight:900;margin-bottom:10px}.result-line{font-size:11px;line-height:1.6;color:#cbd5e1;border-top:1px solid rgba(148,163,184,.12);padding-top:7px;margin-top:7px}.good{color:#4ade80}.bad{color:#f87171}
+.final-wrap{width:100%;max-width:920px;margin:0 auto}.final-card-preview{position:relative;width:min(520px,94%);margin:0 auto 16px;aspect-ratio:1123/794;border-radius:18px;overflow:hidden;box-shadow:0 22px 70px rgba(0,0,0,.5);background:#111}.final-card-preview img{width:100%;height:100%;object-fit:cover}.card-overlay-name{position:absolute;left:50%;top:20%;transform:translateX(-50%);font-size:clamp(18px,3vw,30px);font-weight:900;white-space:nowrap}.card-overlay-scores{position:absolute;right:10%;top:37%;font-size:clamp(11px,1.7vw,16px);line-height:1.7;text-align:right}.card-overlay-total{position:absolute;right:10%;bottom:18%;font-size:clamp(18px,3vw,28px);font-weight:900}.shine{position:absolute;inset:-20% auto -20% -35%;width:18%;transform:skewX(-18deg);background:linear-gradient(90deg,transparent,rgba(255,255,255,.9),transparent);animation:cardShine 1.25s ease-out .2s forwards}.final-title{text-align:center;font-size:22px;margin:0 0 7px}.final-sub{text-align:center;color:#94a3b8;margin:0 0 12px;font-size:11px}.save-card{display:block;margin:0 auto 4px;padding:11px 20px;border:1px solid #38bdf8;border-radius:11px;background:#0b1625;color:#e0f2fe;font-weight:900;cursor:pointer}.share-prompt{text-align:center;margin:2px auto 9px;max-width:430px;color:#cbd5e1;font-size:12px;line-height:1.45}.share-caption{display:block;width:fit-content;text-align:center;margin:0 auto 5px;padding:10px 18px;border:1px solid #38bdf8;border-radius:11px;background:#0b1625;color:#e0f2fe;font-size:13px;font-weight:900;text-decoration:none;box-shadow:0 8px 22px rgba(56,189,248,.12);transition:transform .18s ease,background .18s ease,box-shadow .18s ease}.share-caption:hover{transform:translateY(-2px);background:#10233b;box-shadow:0 10px 26px rgba(56,189,248,.22)}.challenge-friend-btn{font-family:inherit;cursor:pointer}.medical-note{text-align:center;color:#64748b;font-size:10px;margin:4px 0 22px}.results-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.result-panel{background:rgba(15,23,42,.82);border:1px solid rgba(148,163,184,.18);border-radius:15px;padding:15px}.result-panel h3{margin:0 0 10px;font-size:15px}.score-big{font-size:24px;font-weight:900;margin-bottom:10px}.result-line{font-size:11px;line-height:1.6;color:#cbd5e1;border-top:1px solid rgba(148,163,184,.12);padding-top:7px;margin-top:7px}.good{color:#4ade80}.bad{color:#f87171}
 .plant-order-block{margin-top:10px}
 .plant-order-title{font-size:10px;color:#94a3b8;margin:9px 0 6px;font-weight:800}
 .plant-order-row{display:flex;direction:ltr;justify-content:center;gap:6px;flex-wrap:nowrap;padding:5px 2px 8px}
@@ -1287,7 +1372,7 @@ html, body {
                 <span>IR / Mic / Radio</span>
             </div>
 
-            <button id="start-shift-btn" onclick="openLabTutorial()">כניסה למעבדה</button>
+            
         </div>
     </div>
 
@@ -1304,7 +1389,7 @@ html, body {
             <div class="tut-step-num">שלב 1</div>
             <div class="tut-main-title">סימולטור אינפרא אדום</div>
             <div class="tut-sub-desc" style="font-size: 11px; color: #38bdf8; font-weight: bold; margin-top: 4px;">
-                סדרו את הצמחים לפי כמות המים שהם צריכים
+               היעזרו בסימולטור כדי לסדר את הצמחים
             </div>
         </div>
     </div>
@@ -1318,6 +1403,30 @@ html, body {
                     <img id="lesson-leaves-n" class="lesson-plant" src="leavesIRN.png" style="opacity:0" alt="צמח בריא באינפרא אדום">
                     <img id="lesson-leaves-t" class="lesson-plant" src="leavesIRT.png" style="opacity:0" alt="צמח עם עודף מים באינפרא אדום">
                     <img id="lesson-leaves-h" class="lesson-plant" src="leavesIRH.png" style="opacity:0" alt="צמח יבש באינפרא אדום">
+                </div>
+                <div id="lesson-water-demo" class="lesson-water-demo" aria-label="השקיית שלושה צמחים">
+                    <div class="lesson-water-plants">
+                        <div class="lesson-water-plant"><img src="sunflowerV.png" alt="חמנייה"></div>
+                        <div class="lesson-water-plant"><img src="leavesV.png" alt="צמח"></div>
+                        <div class="lesson-water-plant"><img src="cactusV.png" alt="קקטוס"></div>
+                    </div>
+                    <div class="lesson-water-meter-row">
+                        <div class="lesson-water-meter"><div class="lesson-water-meter-fill"></div></div>
+                        <div class="lesson-water-meter"><div class="lesson-water-meter-fill"></div></div>
+                        <div class="lesson-water-meter"><div class="lesson-water-meter-fill"></div></div>
+                    </div>
+                    <div class="lesson-water-cup"></div>
+                    <div class="lesson-water-stream"></div>
+                </div>
+                <div id="lesson-heat-demo" class="lesson-heat-demo" aria-label="שני צמחים באינפרא אדום">
+                    <div class="lesson-heat-card">
+                        <img src="leavesIRT.png" alt="צמח עם עודף מים">
+                        <span>עודף מים</span>
+                    </div>
+                    <div class="lesson-heat-card">
+                        <img src="leavesIRH.png" alt="צמח שהתייבש">
+                        <span>התייבשות</span>
+                    </div>
                 </div>
                 <img id="lesson-glasses" class="lesson-glasses" src="IRglasses.png" alt="משקפי אינפרא אדום" style="display:none;">
                 <div class="lesson-press"></div>
@@ -1341,7 +1450,7 @@ html, body {
             <div id="lesson-text"></div>
             <div class="lesson-nav">
                 <button id="lesson-prev" class="lesson-arrow" onclick="changeLesson(-1)">‹</button>
-                <span id="lesson-progress" class="lesson-progress">1 / 5</span>
+                <span id="lesson-progress" class="lesson-progress">1 / 4</span>
                 <button id="lesson-next" class="lesson-arrow" onclick="changeLesson(1)">›</button>
             </div>
         </div>
@@ -1562,17 +1671,23 @@ html, body {
     let targetWateringIndex = null;
     let gameActive = false;
 
+    let labTutorialStarted = false;
+
     function openLabTutorial() {
+        if (labTutorialStarted) return;
+        labTutorialStarted = true;
         const introScreen = document.getElementById('intro-screen');
         const overlay = document.getElementById('tutorial-overlay');
         introScreen.style.opacity = '0';
         setTimeout(() => {
             introScreen.style.display = 'none';
             overlay.style.display = 'flex';
-            // The stage-entry card is informational only; it closes automatically.
-            setTimeout(closeLabTutorial, 3000);
-        }, 800);
+            // The spectrum completes first; then the stage card briefly introduces Stage 1.
+            setTimeout(closeLabTutorial, 1450);
+        }, 650);
     }
+
+    // savePlayerName() starts the spectrum sequence after the player enters a name.
 
     function closeLabTutorial() {
         const overlay = document.getElementById('tutorial-overlay');
@@ -1591,33 +1706,23 @@ html, body {
 
     const lessonSteps = [
         {
-            title:'כך מתחילים',
-            text:'גררו את המשקה מצד ימין למסך והשקו את הצמחים. מד המים שמתחת לצמח מתמלא בהתאם לכמות המים.',
+            title:'השקו את כל הצמחים',
+            text:'בראייה הרגילה השקו את כל הצמחים לכמות שווה. היעזרו במד המים מתחת לכל צמח.',
             plant:'v', meter:'normal', fill:88, animation:'water'
         },
         {
-            title:'עוברים לראייה אינפרא אדומה',
-            text:'בראייה אינפרא אדומה ניתן לראות מה הטמפרטורה של כל צמח. אם הצמח בגוון כחול בהיר, הטמפרטורה של הצמח טובה.',
+            title:'עברו לראייה אינפרא אדומה',
+            text:'ראייה אינפרא אדומה מאפשרת לראות הבדלים בטמפרטורה, כך ניתן לזהות מה בריאות הצמח.',
             plant:'n', meter:'ir', fill:88, animation:'glasses'
         },
         {
-            title:'יותר מדי מים',
-            text:'אם הצמח בגוון כהה מדי, הטמפרטורה שלו נמוכה והוא קיבל יותר מדי מים.',
-            plant:'t', meter:'ir', fill:88, animation:'none'
+            title:'עקבו אחר סדר ההתייבשות',
+            text:'צמח בגוון כהה פירושו קור יתר ועודף מים. צמח בגוון אדום פירושו חום גבוה והתייבשות.',
+            plant:'h', meter:'ir', fill:28, animation:'heat'
         },
         {
-            title:'מעט מדי מים',
-            text:'אם הצמח בגוון אדום, צהוב או כתום, הטמפרטורה שלו גבוהה והוא יבש מדי.',
-            plant:'h', meter:'ir', fill:28, animation:'none'
-        },
-        {
-            title:'מצליבים את המידע',
-            text:'באינפרא אדום המים כהים, לכן כדי לדעת את כמות המים בהתאם לבריאות הצמחים צריך להצליב מידע בין ראייה רגילה לאינפרא אדומה.',
-            plant:'n', meter:'ir', fill:88, animation:'spectrum'
-        },
-        {
-            title:'מסדרים את הצמחים',
-            text:'אחרי שהבנתם את מצב הצמח, מסדרים את הצמחים במקום הנכון באמצעות גרירה.',
+            title:'סדרו את הצמחים',
+            text:'גררו צמח למקום של צמח אחר כדי להחליף ביניהם, ולסדר אותם לפי סדר ההתייבשות.',
             plant:'v', meter:'normal', fill:88, animation:'drag'
         }
     ];
@@ -1694,6 +1799,10 @@ html, body {
         glasses.style.filter = '';
         document.getElementById('lesson-cup').style.display = step.animation === 'water' ? 'block' : 'none';
         document.getElementById('lesson-stream').style.display = step.animation === 'water' ? 'block' : 'none';
+        const heatDemo = document.getElementById('lesson-heat-demo');
+        if (heatDemo) heatDemo.style.display = step.animation === 'heat' ? 'flex' : 'none';
+        const waterDemo = document.getElementById('lesson-water-demo');
+        if (waterDemo) waterDemo.style.display = step.animation === 'water' ? 'flex' : 'none';
         const dragDemo = document.getElementById('lesson-drag-demo');
         dragDemo.classList.remove('play');
         dragDemo.style.display = step.animation === 'drag' ? 'flex' : 'none';
@@ -2606,7 +2715,10 @@ html, body {
           <div class="card-overlay-total" id="card-total">-- / 300</div>
           <div class="shine"></div>
         </div>
-        <p class="share-caption">שתפו אותנו בתחנת קוונטום</p>
+        <a class="share-caption" href="https://discord.gg/zEzXmZ9CKX" target="_blank" rel="noopener noreferrer">שתפו אותנו בתחנת קוונטום</a>
+        <p class="share-prompt">כל חוקר צריך מישהו שיאתגר אותו.
+אז... מי מהחברים שלכם יצליח יותר?</p>
+        <button type="button" class="share-caption challenge-friend-btn" id="challenge-friend-btn">אתגר חבר</button>
         <p class="medical-note">המידע אינו מידע רפואי</p>
         <div class="results-grid">
           <section class="result-panel"><h3>סימולטור אינפרא אדום</h3><div class="score-big" id="detail-stage1-score">0 / 100</div><div id="stage1-order-detail"></div></section>
@@ -2897,6 +3009,20 @@ function savePlayerName(){
   if(!name){document.getElementById('name-error').textContent='נא להזין שם כדי להמשיך.';input.focus();return;}
   localStorage.setItem('playerName',name);
   document.getElementById('name-screen').style.display='none';
+
+  // Start the electromagnetic-spectrum loading animation only after the name screen is cleared.
+  const fill=document.getElementById('spectrum-intro-fill');
+  const track=document.getElementById('spectrum-intro-track');
+  if(fill){
+    fill.style.animation='none';
+    void fill.offsetWidth;
+    fill.style.animation='spectrumIntroExpand 2s linear forwards';
+  }
+  if(track){
+    track.classList.remove('spectrum-ready');
+    void track.offsetWidth;
+  }
+  setTimeout(openLabTutorial,2050);
 }
 
 function showStage3Transition(){
@@ -3172,5 +3298,34 @@ async function saveFinalCard(){
  const draw=()=>{ctx.drawImage(img,0,0,w,h);const name=localStorage.getItem('playerName')||'חוקר';const s1=Number(localStorage.getItem('stage1Score')||0),s2=Number(localStorage.getItem('stage2Score')||0),s3=Number(localStorage.getItem('stage3Score')||0);ctx.direction='rtl';ctx.textAlign='center';ctx.fillStyle='#fff';ctx.font=`900 ${Math.round(w*.045)}px Arial`;ctx.fillText(name,w*.5,h*.22);ctx.textAlign='right';ctx.font=`700 ${Math.round(w*.022)}px Arial`;ctx.fillText(`שלב 1 · ${s1}/100`,w*.88,h*.40);ctx.fillText(`דני · ${s2}/100`,w*.88,h*.46);ctx.fillText(`שלב 3 · ${s3}/100`,w*.88,h*.52);ctx.font=`900 ${Math.round(w*.05)}px Arial`;ctx.fillText(`${s1+s2+s3} / 300`,w*.88,h*.78);canvas.toBlob(async blob=>{if(!blob)return;const file=new File([blob],'Quantum-Station-score.png',{type:'image/png'});if(navigator.share && navigator.canShare && navigator.canShare({files:[file]})){try{await navigator.share({files:[file],title:'Quantum Station',text:'שתפו אותנו בתחנת קוונטום'});return}catch(e){}}const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='Quantum-Station-score.png';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);},'image/png');};
  if(img.complete && img.naturalWidth) draw(); else img.onload=draw;
 }
+async function shareChallengeWithFriend(){
+  const url='https://qslighttest.online/';
+  const text='כל חוקר צריך מישהו שיאתגר אותו.\nאז... מי מהחברים שלכם יצליח יותר? 🚀';
+  if(navigator.share){
+    try{
+      await navigator.share({title:'Quantum Station',text,url});
+      return;
+    }catch(err){
+      if(err && err.name==='AbortError') return;
+    }
+  }
+  try{
+    if(navigator.clipboard && window.isSecureContext){
+      await navigator.clipboard.writeText(url);
+    }else{
+      const ta=document.createElement('textarea');
+      ta.value=url; ta.setAttribute('readonly',''); ta.style.position='fixed'; ta.style.opacity='0';
+      document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove();
+    }
+    alert('הקישור לאתגר הועתק ללוח.');
+  }catch(err){
+    alert('לא ניתן לפתוח את תפריט השיתוף או להעתיק את הקישור.\n'+url);
+  }
+}
+
+document.addEventListener('DOMContentLoaded',()=>{
+  const btn=document.getElementById('challenge-friend-btn');
+  if(btn) btn.addEventListener('click',shareChallengeWithFriend);
+});
 </script>
 </body>
